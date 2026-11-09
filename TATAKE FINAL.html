@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TATAKE - System UI Overlay</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Orbitron & Rajdhani & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            rajdhani: ['Rajdhani', 'sans-serif'],
+            sans: ['Inter', 'sans-serif']
+          },
+          colors: {
+            hud: {
+              bg: '#040814',
+              panel: 'rgba(10, 20, 38, 0.85)',
+              border: '#1e3a5f',
+              cyan: '#00f0ff',
+              magenta: '#ff0055',
+              crimson: '#e63946',
+              gold: '#ffb703',
+              green: '#00ffaa',
+              dark: '#080f24'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Sci-Fi Hologram & Cyberpunk Styles */
+    body {
+      background-color: #040814;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #02050e 0%, #060c1d 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scanline overlay */
+    .scanline {
+      background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0, 240, 255, 0.03) 50%,
+        rgba(0, 240, 255, 0.03)
+      );
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+
+    /* Cyber HUD Border Corners */
+    .cyber-panel {
+      position: relative;
+      background: rgba(8, 16, 36, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.05), inset 0 0 15px rgba(0, 240, 255, 0.03);
+      clip-path: polygon(
+        0 0, 
+        calc(100% - 14px) 0, 100% 14px, 
+        100% 100%, 
+        14px 100%, 0 calc(100% - 14px)
+      );
+    }
+
+    .cyber-panel-red {
+      border-color: rgba(230, 57, 70, 0.4);
+      box-shadow: 0 0 20px rgba(230, 57, 70, 0.1), inset 0 0 15px rgba(230, 57, 70, 0.04);
+    }
+
+    .cyber-panel-gold {
+      border-color: rgba(255, 183, 3, 0.4);
+      box-shadow: 0 0 20px rgba(255, 183, 3, 0.1), inset 0 0 15px rgba(255, 183, 3, 0.04);
+    }
+
+    .cyber-btn {
+      position: relative;
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cyber-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+    }
+
+    .cyber-btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    /* Glowing animations */
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6)); }
+      50% { filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.9)); }
+    }
+
+    .neon-text-cyan {
+      color: #00f0ff;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    }
+
+    .neon-text-red {
+      color: #ff0055;
+      text-shadow: 0 0 8px rgba(255, 0, 85, 0.6);
+    }
+
+    .neon-text-gold {
+      color: #ffb703;
+      text-shadow: 0 0 8px rgba(255, 183, 3, 0.6);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #040814;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e3a5f;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+
+    /* Circular Progress Ring */
+    .progress-ring__circle {
+      transition: stroke-dashoffset 0.5s ease-in-out;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    /* Confetti/Particle Canvas */
+    #fxCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+
+  <!-- Firebase Scripts (Modular ES Modules approach for Cloud Sync) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    window.FirebaseBridge = {
+      init: async function(onSyncCallback, onStatusCallback) {
+        try {
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'tatake-isekai-system';
+          const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+          if (!firebaseConfig) {
+            onStatusCallback({ ready: false, message: "Local Mode (No Cloud Config)" });
+            return;
+          }
+
+          const app = initializeApp(firebaseConfig);
+          const auth = getAuth(app);
+          const db = getFirestore(app);
+
+          onStatusCallback({ ready: false, message: "Authenticating Cloud..." });
+
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
+
+          onAuthStateChanged(auth, async (user) => {
+            if (user) {
+              const userId = user.uid;
+              window.currentUserId = userId;
+              onStatusCallback({ ready: true, userId: userId, message: "Cloud Sync Active" });
+
+              // Public/User doc path according to Rule 1
+              const docRef = doc(db, 'artifacts', appId, 'users', userId, 'systemData', 'state');
+
+              // Realtime listener
+              onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                  const cloudData = docSnap.data();
+                  if (cloudData && cloudData.payload) {
+                    onSyncCallback(cloudData.payload);
+                  }
+                }
+              }, (err) => {
+                console.warn("Firestore listen error:", err);
+              });
+
+              // Save function attached to window
+              window.saveToCloud = async (dataPayload) => {
+                try {
+                  await setDoc(docRef, { payload: dataPayload, updatedAt: new Date().toISOString() });
+                } catch (err) {
+                  console.error("Cloud save failed:", err);
+                }
+              };
+            }
+          });
+
+        } catch (e) {
+          console.warn("Firebase Init fallback to local storage:", e);
+          onStatusCallback({ ready: false, message: "Offline / Local Mode" });
+        }
+      }
+    };
+  </script>
+</head>
+<body class="font-sans antialiased text-slate-200">
+  <canvas id="fxCanvas"></canvas>
+  <div class="scanline fixed inset-0 z-50"></div>
+
+  <!-- MAIN HUD CONTAINER -->
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 py-4 relative z-10">
+
+    <!-- TOP SYSTEM HEADER & NAV BAR -->
+    <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-hud-cyan/30">
+      <div class="flex items-center gap-3 text-center md:text-left">
+        <div class="w-12 h-12 rounded-lg bg-hud-cyan/10 border border-hud-cyan flex items-center justify-center text-hud-cyan text-2xl shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <div>
+          <h1 class="font-orbitron text-2xl sm:text-3xl font-black tracking-widest text-white flex items-center gap-2">
+            TATAKE <span class="text-xs px-2 py-0.5 rounded bg-hud-crimson text-white font-rajdhani font-bold">SYSTEM V7.0</span>
+          </h1>
+          <p class="text-xs text-hud-cyan/80 font-rajdhani tracking-wider uppercase">Iron Discipline Habit Protocol & Leveler HUD</p>
+        </div>
+      </div>
+
+      <!-- SYSTEM CONTROLS & CLOUD STATUS -->
+      <div class="flex items-center gap-3 flex-wrap justify-center">
+        <!-- Sound Toggle -->
+        <button id="soundToggleBtn" class="cyber-btn bg-hud-dark border border-hud-cyan/40 px-3 py-1.5 rounded text-xs font-rajdhani font-semibold text-hud-cyan hover:bg-hud-cyan/20 flex items-center gap-1.5">
+          <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+          <span id="soundLabel">SFX ON</span>
+        </button>
+
+        <!-- Cloud Sync Status Badge -->
+        <div id="cloudStatusBadge" class="bg-hud-dark border border-slate-700 px-3 py-1.5 rounded text-xs font-rajdhani flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="cloudDot"></span>
+          <span class="text-slate-300" id="cloudStatusText">Connecting Cloud...</span>
+        </div>
+
+        <!-- Export / Import Modals Trigger -->
+        <div class="flex items-center gap-1.5">
+          <button id="exportBtn" title="Export Backup JSON" class="cyber-btn bg-hud-dark border border-slate-600 px-2.5 py-1.5 rounded text-xs text-slate-300 hover:text-hud-cyan hover:border-hud-cyan">
+            <i class="fa-solid fa-download"></i> Backup
+          </button>
+          <button id="importBtn" title="Import Backup JSON" class="cyber-btn bg-hud-dark border border-slate-600 px-2.5 py-1.5 rounded text-xs text-slate-300 hover:text-hud-cyan hover:border-hud-cyan">
+            <i class="fa-solid fa-upload"></i> Restore
+          </button>
+          <input type="file" id="importFileInput" accept=".json" class="hidden">
+        </div>
+      </div>
+    </header>
+
+    <!-- PLAYER CARD HUD -->
+    <section class="cyber-panel p-5 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <!-- Avatar & Rank Section -->
+        <div class="lg:col-span-4 flex items-center gap-4 border-b lg:border-b-0 lg:border-r border-hud-cyan/20 pb-4 lg:pb-0 lg:pr-4">
+          <div class="relative">
+            <div class="w-20 h-20 rounded-xl bg-slate-900 border-2 border-hud-cyan flex items-center justify-center text-hud-cyan text-4xl shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+              <i class="fa-solid fa-user-ninja"></i>
+            </div>
+            <div id="rankBadge" class="absolute -bottom-2 -right-2 bg-hud-crimson text-white text-xs font-orbitron font-extrabold px-2 py-0.5 rounded border border-white shadow-md">
+              RANK E
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="playerTitle" class="text-xs font-orbitron font-semibold text-hud-gold uppercase tracking-wider">Aobie The Beast</span>
+              <span class="text-[10px] px-1.5 py-0.2 bg-hud-cyan/20 text-hud-cyan rounded border border-hud-cyan/40 font-mono">Aobie #01</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-orbitron font-black text-white" id="playerNameDisplay">DISCIPLINE SOVEREIGN</h2>
+            <div class="flex items-center gap-3 text-xs text-slate-400 font-rajdhani mt-1">
+              <span><i class="fa-solid fa-fire text-hud-crimson mr-1"></i>Streak: <strong id="streakDisplay" class="text-white">0 Days</strong></span>
+              <span><i class="fa-solid fa-shield-halved text-hud-cyan mr-1"></i>Class: <strong id="classTitle" class="text-hud-cyan">Monk of Iron</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- XP & Level Progress Bar -->
+        <div class="lg:col-span-5">
+          <div class="flex justify-between items-baseline mb-1">
+            <span class="font-orbitron font-bold text-lg text-white flex items-center gap-2">
+              LEVEL <span id="levelDisplay" class="text-hud-cyan text-2xl font-black">1</span>
+            </span>
+            <span class="font-mono text-xs text-hud-cyan" id="xpText">0 / 5,000 XP</span>
+          </div>
+          <div class="h-4 bg-slate-900 rounded-full p-0.5 border border-hud-cyan/30 overflow-hidden relative">
+            <div id="xpFill" class="h-full rounded-full bg-gradient-to-r from-hud-cyan via-blue-500 to-hud-crimson transition-all duration-500 shadow-[0_0_12px_rgba(0,240,255,0.8)]" style="width: 0%;"></div>
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-400 font-rajdhani mt-1.5">
+            <span id="totalXpDisplay">Total Earned: 0 XP</span>
+            <span id="xpToNextDisplay" class="text-hud-gold">5,000 XP to next rank</span>
+          </div>
+        </div>
+
+        <!-- Quick Stats Widget -->
+        <div class="lg:col-span-3 grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-900/80 border border-slate-700/60 p-2 rounded">
+            <span class="block text-xs font-rajdhani text-slate-400">Mandatory</span>
+            <strong id="mandatoryStat" class="text-base font-orbitron text-hud-crimson">0/50</strong>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-700/60 p-2 rounded">
+            <span class="block text-xs font-rajdhani text-slate-400">Dailies</span>
+            <strong id="dailyStat" class="text-base font-orbitron text-hud-cyan">0</strong>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-700/60 p-2 rounded">
+            <span class="block text-xs font-rajdhani text-slate-400">Monthly</span>
+            <strong id="monthlyStat" class="text-base font-orbitron text-hud-gold">0</strong>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="flex items-center gap-2 overflow-x-auto pb-2 mb-6 no-scrollbar">
+      <button class="tab-btn cyber-btn active bg-hud-cyan text-slate-950 font-orbitron text-xs font-extrabold px-4 py-2.5 rounded whitespace-nowrap" data-page="dashboard">
+        <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-hud-crimson/50 text-hud-crimson hover:bg-hud-crimson/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="mandatory">
+        <i class="fa-solid fa-bolt mr-1.5"></i> ⚡ Mandatory (50)
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-hud-cyan/40 text-hud-cyan hover:bg-hud-cyan/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="daily">
+        <i class="fa-solid fa-calendar-day mr-1.5"></i> Daily Quests
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-slate-700 text-slate-300 hover:border-hud-cyan font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="monthly">
+        <i class="fa-solid fa-calendar-check mr-1.5"></i> Monthly Goals
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-hud-gold/50 text-hud-gold hover:bg-hud-gold/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="goals">
+        <i class="fa-solid fa-crosshair mr-1.5"></i> 🎯 Strategic Goals
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-purple-500/50 text-purple-400 hover:bg-purple-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="rewards">
+        <i class="fa-solid fa-gift mr-1.5"></i> Level Rewards
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="budget">
+        <i class="fa-solid fa-wallet mr-1.5"></i> Budget
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-slate-700 text-slate-300 hover:border-hud-cyan font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="deliverables">
+        <i class="fa-solid fa-list-check mr-1.5"></i> Deliverables
+      </button>
+    </nav>
+
+    <!-- SEARCH & CATEGORY FILTER BAR (GLOBAL FOR LISTS) -->
+    <div id="filterBar" class="cyber-panel p-3 mb-6 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="relative w-full md:w-72">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
+        <input id="searchInput" type="text" placeholder="Search tasks or goals..." class="w-full bg-slate-900 border border-slate-700 rounded py-1.5 pl-8 pr-3 text-xs text-white focus:outline-none focus:border-hud-cyan">
+      </div>
+      <div class="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+        <span class="text-xs text-slate-400 font-rajdhani font-semibold mr-1">Category:</span>
+        <button class="cat-filter-btn active text-xs font-semibold px-2.5 py-1 rounded bg-hud-cyan text-slate-950" data-cat="ALL">ALL</button>
+        <button class="cat-filter-btn text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:text-white" data-cat="Gym">Gym</button>
+        <button class="cat-filter-btn text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:text-white" data-cat="Evolution">Evolution</button>
+        <button class="cat-filter-btn text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:text-white" data-cat="Work">Work</button>
+        <button class="cat-filter-btn text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:text-white" data-cat="Finance">Finance</button>
+        <button class="cat-filter-btn text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:text-white" data-cat="Socialise">Socialise</button>
+      </div>
+    </div>
+
+    <!-- PAGES CONTENT -->
+
+    <!-- PAGE 1: DASHBOARD -->
+    <section id="page-dashboard" class="page-content space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Mandatory Circular Widget -->
+        <div class="cyber-panel cyber-panel-red p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-orbitron font-bold text-white text-base flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-hud-crimson"></i> Mandatory Protocol
+              </h3>
+              <span class="text-xs text-slate-400 font-mono" id="dashMandatoryCount">0/50</span>
+            </div>
+            <div class="flex items-center justify-center my-4 relative">
+              <svg class="w-32 h-32">
+                <circle class="text-slate-800" stroke-width="8" stroke="currentColor" fill="transparent" r="50" cx="64" cy="64"/>
+                <circle id="mandatoryRing" class="text-hud-crimson progress-ring__circle" stroke-width="8" stroke-dasharray="314.15" stroke-dashoffset="314.15" stroke-linecap="round" stroke="currentColor" fill="transparent" r="50" cx="64" cy="64"/>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span id="mandatoryPctText" class="text-xl font-orbitron font-black text-white">0%</span>
+                <span class="text-[10px] text-slate-400 font-rajdhani">Completed</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 text-center">50 Core Habits. Execute daily for max discipline XP gains.</p>
+        </div>
+
+        <!-- Strategic Goals Summary -->
+        <div class="cyber-panel cyber-panel-gold p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-orbitron font-bold text-white text-base flex items-center gap-2">
+                <i class="fa-solid fa-bullseye text-hud-gold"></i> Strategic Objectives
+              </h3>
+              <span class="text-xs text-hud-gold font-mono" id="dashGoalCount">0 Active</span>
+            </div>
+            <div id="dashGoalSummary" class="space-y-3 my-2 text-xs">
+              <!-- Dynamic inserted goals snapshot -->
+            </div>
+          </div>
+          <div class="pt-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-400">
+            <span>Career & Personal Roadmaps</span>
+            <button onclick="switchTab('goals')" class="text-hud-gold hover:underline">View All →</button>
+          </div>
+        </div>
+
+        <!-- Level Rewards Progress -->
+        <div class="cyber-panel p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-orbitron font-bold text-white text-base flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-purple-400"></i> Next Level Reward
+              </h3>
+            </div>
+            <div id="dashRewardNotice" class="my-3">
+              <!-- Dynamic inserted next reward -->
+            </div>
+          </div>
+          <div class="pt-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-400">
+            <span>Milestone Incentive</span>
+            <button onclick="switchTab('rewards')" class="text-purple-400 hover:underline">Manage Rewards →</button>
+          </div>
+        </div>
+
+        <!-- Today's Quests Snapshot -->
+        <div class="cyber-panel p-5 lg:col-span-2">
+          <h3 class="font-orbitron font-bold text-white text-base mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-hud-cyan"></i> Daily Quests Progress
+          </h3>
+          <div id="dashDailySummary" class="space-y-2 text-xs">
+            <!-- Dynamic Daily Quests -->
+          </div>
+        </div>
+
+        <!-- Budget Quick Snapshot -->
+        <div class="cyber-panel p-5">
+          <h3 class="font-orbitron font-bold text-white text-base mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-wallet text-emerald-400"></i> Financial Velocity
+          </h3>
+          <div id="dashBudgetSummary" class="text-xs space-y-2">
+            <p class="text-slate-400">Configure balance & spending in the Budget tab.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PAGE 2: MANDATORY TASKS -->
+    <section id="page-mandatory" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-6 cyber-panel-red">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b border-hud-crimson/30 pb-3">
+          <div>
+            <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-hud-crimson"></i> 50 MANDATORY HABITS
+            </h2>
+            <p class="text-xs text-slate-400">Strict Non-negotiable Protocol. High priority discipline habits (Up to 30 XP each).</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 font-mono">Today's Progress</span>
+            <div class="font-orbitron font-bold text-hud-crimson text-lg" id="mandatoryHeaderProgress">0 / 50 (0%)</div>
+          </div>
+        </div>
+
+        <!-- Add Custom Mandatory Form -->
+        <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
+          <h4 class="text-xs font-orbitron text-hud-cyan mb-2 uppercase">Create Custom Mandatory Task</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <input id="mandatoryName" type="text" placeholder="e.g. Cold Plunge 3 Minutes" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <select id="mandatoryCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
+            <input id="mandatoryXP" type="number" min="1" max="30" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <button id="addMandatoryBtn" class="sm:col-span-2 cyber-btn bg-hud-crimson text-white font-orbitron text-xs font-bold py-2 rounded">
+              + ADD
+            </button>
+          </div>
+        </div>
+
+        <!-- Mandatory Grouped List -->
+        <div id="mandatoryListContainer" class="space-y-6">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: DAILY QUESTS -->
+    <section id="page-daily" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-6">
+        <div class="flex justify-between items-center mb-4 border-b border-hud-cyan/30 pb-3">
+          <div>
+            <h2 class="font-orbitron font-extrabold text-xl text-white">DAILY QUESTS</h2>
+            <p class="text-xs text-slate-400">Repeatable routine tasks (1 to 20 XP per quest).</p>
+          </div>
+          <span class="text-xs text-hud-cyan font-mono" id="dailyDateLabel">Today</span>
+        </div>
+
+        <!-- Add Daily Form -->
+        <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <input id="dailyName" type="text" placeholder="e.g. 30-min Cardio Session" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <select id="dailyCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
+            <input id="dailyXP" type="number" min="1" max="20" value="10" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <button id="addDailyBtn" class="sm:col-span-2 cyber-btn bg-hud-cyan text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
+              + ADD QUEST
+            </button>
+          </div>
+        </div>
+
+        <ul id="dailyList" class="space-y-2">
+          <!-- Rendered via JS -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- PAGE 4: MONTHLY GOALS -->
+    <section id="page-monthly" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-6">
+        <div class="mb-4 border-b border-slate-700 pb-3">
+          <h2 class="font-orbitron font-extrabold text-xl text-white">MONTHLY OBJECTIVES</h2>
+          <p class="text-xs text-slate-400">Major monthly milestones. Awarded upon completion.</p>
+        </div>
+
+        <!-- Add Monthly Form -->
+        <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <input id="monthlyName" type="text" placeholder="e.g. Finish Reading 2 Technical Books" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <select id="monthlyCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
+            <input id="monthlyXP" type="number" min="1" max="50" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <button id="addMonthlyBtn" class="sm:col-span-2 cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
+              + ADD GOAL
+            </button>
+          </div>
+        </div>
+
+        <ul id="monthlyList" class="space-y-2">
+          <!-- Rendered via JS -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- PAGE 5: STRATEGIC GOALS -->
+    <section id="page-goals" class="page-content hidden space-y-6">
+      <div class="cyber-panel cyber-panel-gold p-6">
+        <div class="mb-4 border-b border-hud-gold/30 pb-3 flex justify-between items-center">
+          <div>
+            <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
+              <i class="fa-solid fa-bullseye text-hud-gold"></i> STRATEGIC ROADMAPS & GOALS
+            </h2>
+            <p class="text-xs text-slate-400">High-level Career & Personal Goals with attached financial targets and action plan steps.</p>
+          </div>
+        </div>
+
+        <!-- Goal Creator Form -->
+        <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6 space-y-3">
+          <h4 class="text-xs font-orbitron text-hud-gold uppercase">New Strategic Roadmap</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input id="goalTitle" type="text" placeholder="Goal Title (e.g. Body Repair / Senior Certification)" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
+            <select id="goalType" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
+              <option value="Personal">Personal Goal</option>
+              <option value="Career">Career Goal</option>
+            </select>
+            <input id="goalDeadline" type="date" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <input id="goalBudget" type="number" placeholder="Budget Target (R)" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
+            <input id="goalSaved" type="number" placeholder="Saved So Far (R)" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
+            <input id="goalMonthly" type="number" placeholder="Monthly Target (R)" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
+            <button id="addGoalBtn" class="cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
+              CREATE ROADMAP
+            </button>
+          </div>
+        </div>
+
+        <!-- Goals Columns -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-orbitron text-sm font-bold text-hud-cyan border-b border-hud-cyan/30 pb-2 mb-4">
+              <i class="fa-solid fa-briefcase mr-1.5"></i> CAREER GOALS
+            </h3>
+            <div id="careerGoalsList" class="space-y-4"></div>
+          </div>
+          <div>
+            <h3 class="font-orbitron text-sm font-bold text-hud-gold border-b border-hud-gold/30 pb-2 mb-4">
+              <i class="fa-solid fa-house-user mr-1.5"></i> PERSONAL GOALS
+            </h3>
+            <div id="personalGoalsList" class="space-y-4"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 6: REWARDS -->
+    <section id="page-rewards" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-6">
+        <div class="mb-4 border-b border-purple-500/30 pb-3">
+          <h2 class="font-orbitron font-extrabold text-xl text-white">LEVEL MILESTONE REWARDS</h2>
+          <p class="text-xs text-slate-400">Define real-world unlocks achieved upon leveling up.</p>
+        </div>
+
+        <!-- Reward Add Form -->
+        <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <input id="rewardLevel" type="number" min="2" placeholder="Level Req (e.g. 5)" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+            <input id="rewardName" type="text" placeholder="Reward Description (e.g. Spa Day / New Gaming Setup)" class="sm:col-span-6 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+            <button id="addRewardBtn" class="sm:col-span-3 cyber-btn bg-purple-600 text-white font-orbitron text-xs font-bold py-2 rounded">
+              SET REWARD
+            </button>
+          </div>
+        </div>
+
+        <div id="rewardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 7: BUDGET TRACKER -->
+    <section id="page-budget" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-6">
+        <div class="mb-4 border-b border-emerald-500/30 pb-3">
+          <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
+            <i class="fa-solid fa-wallet text-emerald-400"></i> MONTHLY BUDGET & VELOCITY TRACKER
+          </h2>
+          <p class="text-xs text-slate-400">Monitor spending speed and project end-of-month balances.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-rajdhani text-slate-400 mb-1">Current Remaining Balance (R)</label>
+            <input id="balanceInput" type="number" step="0.01" placeholder="e.g. 8500" class="w-full bg-slate-950 border border-slate-700 rounded p-2.5 text-sm text-white focus:outline-none focus:border-emerald-400">
+          </div>
+          <div>
+            <label class="block text-xs font-rajdhani text-slate-400 mb-1">Total Spent So Far This Month (R)</label>
+            <input id="spentInput" type="number" step="0.01" placeholder="e.g. 3200" class="w-full bg-slate-950 border border-slate-700 rounded p-2.5 text-sm text-white focus:outline-none focus:border-emerald-400">
+          </div>
+        </div>
+
+        <div class="flex gap-3 mb-6">
+          <button id="saveBudgetBtn" class="cyber-btn bg-emerald-500 text-slate-950 font-orbitron text-xs font-bold px-5 py-2.5 rounded">
+            SAVE FINANCIAL DATA
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded">
+            <span class="block text-xs text-slate-400 mb-1">Current Balance</span>
+            <strong id="budgetBalanceVal" class="text-xl font-orbitron text-white">R0.00</strong>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded">
+            <span class="block text-xs text-slate-400 mb-1">Avg Daily Spend Pace</span>
+            <strong id="dailySpendVal" class="text-xl font-orbitron text-hud-cyan">R0.00</strong>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded">
+            <span class="block text-xs text-slate-400 mb-1">Projected Month-End Balance</span>
+            <strong id="projectedBalanceVal" class="text-xl font-orbitron text-emerald-400">R0.00</strong>
+          </div>
+        </div>
+
+        <div id="budgetNote" class="mt-4 p-3 bg-slate-900/60 border-l-2 border-emerald-400 text-xs text-slate-300">
+          Projections calculate dynamically based on total spent divided by days elapsed in current month.
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 8: DELIVERABLES OVERVIEW -->
+    <section id="page-deliverables" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-6">
+        <div class="mb-4 border-b border-slate-700 pb-3">
+          <h2 class="font-orbitron font-extrabold text-xl text-white">CONSOLIDATED DELIVERABLES</h2>
+          <p class="text-xs text-slate-400">Master inventory view of all active habits, daily quests, and monthly goals sorted by category.</p>
+        </div>
+
+        <div id="deliverablesContainer" class="space-y-6">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- LEVEL UP CELEBRATION MODAL -->
+  <div id="levelModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="cyber-panel cyber-panel-gold max-w-md w-full p-8 text-center relative animate-bounce-short">
+      <div class="w-16 h-16 bg-hud-gold/20 text-hud-gold rounded-full border border-hud-gold flex items-center justify-center text-3xl mx-auto mb-4 shadow-[0_0_20px_rgba(255,183,3,0.5)]">
+        <i class="fa-solid fa-crown"></i>
+      </div>
+      <h3 class="font-orbitron font-black text-xs text-hud-gold tracking-widest uppercase mb-1">SYSTEM NOTIFICATION</h3>
+      <h2 class="font-orbitron font-black text-3xl text-white mb-2">LEVEL UP!</h2>
+      <p class="text-sm text-slate-300 font-rajdhani mb-4">You have achieved <span id="modalLevelTitle" class="text-hud-cyan font-bold">Level X</span></p>
+      
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg mb-6">
+        <span class="block text-[11px] text-slate-400 uppercase font-mono">UNLOCKED MILESTONE REWARD</span>
+        <strong id="modalRewardText" class="text-lg font-orbitron text-hud-gold block mt-1">No custom reward configured</strong>
+      </div>
+
+      <button id="closeModalBtn" class="cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-black px-6 py-3 rounded tracking-wider w-full">
+        CLAIM & CONTINUE
+      </button>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toast" class="fixed bottom-4 right-4 z-50 bg-hud-dark border border-hud-cyan px-4 py-3 rounded shadow-lg text-xs font-rajdhani text-white flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300">
+    <i class="fa-solid fa-circle-info text-hud-cyan" id="toastIcon"></i>
+    <span id="toastMsg">Action recorded</span>
+  </div>
+
+  <!-- JS CONTROLLER & LOGIC -->
+  <script>
+    // System Constants & Defaults
+    const CATEGORIES = ["Gym", "Evolution", "Work", "Finance", "Socialise"];
+    const STORAGE_KEY = "tatake_isekai_v7";
+    const todayStr = () => new Date().toISOString().slice(0, 10);
+    const monthKey = () => new Date().toISOString().slice(0, 7);
+    const formatMoney = n => "R" + Number(n || 0).toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // 50 DEFAULT MANDATORY HABITS (Capped max 30 XP)
+    const DEFAULT_MANDATORY_TASKS = [
+      // Gym / Fitness (10)
+      { id: "m1", name: "100 Push-ups Daily Challenge", category: "Gym", xp: 30 },
+      { id: "m2", name: "5km Morning Run / Cardio", category: "Gym", xp: 30 },
+      { id: "m3", name: "Heavy Compound Lifting Session", category: "Gym", xp: 30 },
+      { id: "m4", name: "10 Minutes Core & Ab Conditioning", category: "Gym", xp: 20 },
+      { id: "m5", name: "Cold Shower Post-Workout", category: "Gym", xp: 20 },
+      { id: "m6", name: "Full Body Mobility & Stretching", category: "Gym", xp: 20 },
+      { id: "m7", name: "Drink 3 Liters of Water Daily", category: "Gym", xp: 20 },
+      { id: "m8", name: "10,000 Steps Daily Walk", category: "Gym", xp: 25 },
+      { id: "m9", name: "High-Protein Meal Prep & Clean Eating", category: "Gym", xp: 25 },
+      { id: "m10", name: "Strict 8 Hours Sleep Schedule", category: "Gym", xp: 30 },
+
+      // Evolution / Mindset (10)
+      { id: "m11", name: "30 Minutes Deep Reading (Self-Mastery/Tech)", category: "Evolution", xp: 30 },
+      { id: "m12", name: "15 Minutes Mindfulness Meditation", category: "Evolution", xp: 20 },
+      { id: "m13", name: "Daily Gratitude & Reflection Journaling", category: "Evolution", xp: 20 },
+      { id: "m14", name: "Zero Social Media Before Noon", category: "Evolution", xp: 25 },
+      { id: "m15", name: "Cold Exposure / Breathwork Session", category: "Evolution", xp: 25 },
+      { id: "m16", name: "Learn/Practice 1 New Technical Concept", category: "Evolution", xp: 30 },
+      { id: "m17", name: "Daily Task Prioritization & Time Blocking", category: "Evolution", xp: 20 },
+      { id: "m18", name: "Study High-Level Architecture / Manuals", category: "Evolution", xp: 30 },
+      { id: "m19", name: "Review Long-Term Goals & Vision Board", category: "Evolution", xp: 15 },
+      { id: "m20", name: "Evening Screen Detox (1 hr before bed)", category: "Evolution", xp: 25 },
+
+      // Work / Career (10)
+      { id: "m21", name: "2 Hours Uninterrupted Deep Work Block", category: "Work", xp: 30 },
+      { id: "m22", name: "Clear Email Inbox to Zero", category: "Work", xp: 20 },
+      { id: "m23", name: "Complete 1 Major Deliverable Milestone", category: "Work", xp: 30 },
+      { id: "m24", name: "Review Technical Code / Calculations", category: "Work", xp: 25 },
+      { id: "m25", name: "Perform Site/System Audit or Optimization", category: "Work", xp: 25 },
+      { id: "m26", name: "Update Professional Registration / CPD Log", category: "Work", xp: 25 },
+      { id: "m27", name: "Organize Workspace & Digital Files", category: "Work", xp: 15 },
+      { id: "m28", name: "Technical Problem Solving / Simulation", category: "Work", xp: 30 },
+      { id: "m29", name: "Review & Submit Pending Proposals", category: "Work", xp: 25 },
+      { id: "m30", name: "End-of-Day Work Retrospective", category: "Work", xp: 15 },
+
+      // Finance (10)
+      { id: "m31", name: "Log All Daily Expenses", category: "Finance", xp: 20 },
+      { id: "m32", name: "Zero Impulse Spending Day", category: "Finance", xp: 30 },
+      { id: "m33", name: "Review Monthly Budget & Projections", category: "Finance", xp: 20 },
+      { id: "m34", name: "Pay Bills & Utilities On Time", category: "Finance", xp: 25 },
+      { id: "m35", name: "Deposit Funds to Savings / Investment", category: "Finance", xp: 30 },
+      { id: "m36", name: "Review Bank Statements / Subscriptions", category: "Finance", xp: 20 },
+      { id: "m37", name: "Track Daily Utility Consumption", category: "Finance", xp: 20 },
+      { id: "m38", name: "Research 1 Financial Investment", category: "Finance", xp: 25 },
+      { id: "m39", name: "Plan Meal Budget for the Week", category: "Finance", xp: 20 },
+      { id: "m40", name: "Verify Net Worth & Savings Buffer", category: "Finance", xp: 30 },
+
+      // Socialise (10)
+      { id: "m41", name: "Reach Out to Family / Check In", category: "Socialise", xp: 25 },
+      { id: "m42", name: "Active Listening Conversation", category: "Socialise", xp: 20 },
+      { id: "m43", name: "Express Genuine Appreciation to Someone", category: "Socialise", xp: 15 },
+      { id: "m44", name: "Plan or Attend Quality Social Event", category: "Socialise", xp: 25 },
+      { id: "m45", name: "Professional Networking Outreach", category: "Socialise", xp: 25 },
+      { id: "m46", name: "Offer Assistance / Mentorship to Peer", category: "Socialise", xp: 20 },
+      { id: "m47", name: "Practice Confident Posture & Body Language", category: "Socialise", xp: 15 },
+      { id: "m48", name: "Disconnect from Tech During Meals", category: "Socialise", xp: 20 },
+      { id: "m49", name: "Send Note of Thanks / Encouragement", category: "Socialise", xp: 15 },
+      { id: "m50", name: "Organize & Tidy Shared Living Space", category: "Socialise", xp: 20 }
+    ];
+
+    const DEFAULT_REWARDS = [
+      { id: "r2", level: 2, name: "Favorite Cheat Meal / Special Treat" },
+      { id: "r3", level: 3, name: "Buy a New Tech Book or Game" },
+      { id: "r4", level: 4, name: "Weekend Movie Night Out" },
+      { id: "r5", level: 5, name: "Weekend Getaway Trip" },
+      { id: "r10", level: 10, name: "Major Tech Gadget Upgrade" }
+    ];
+
+    const DEFAULT_GOALS = [
+      {
+        id: "g1",
+        type: "Personal",
+        title: "Fix Car Scratches & Paint Correction",
+        deadline: "2026-12-31",
+        budget: 3000,
+        saved: 1000,
+        monthlyTarget: 1000,
+        steps: [
+          { id: "s1", text: "Get auto body shop repair quotes", done: true },
+          { id: "s2", text: "Save R1,000/month for car repairs", done: true },
+          { id: "s3", text: "Book car repair session", done: false },
+          { id: "s4", text: "Inspect finished car bodywork", done: false }
+        ]
+      },
+      {
+        id: "g2",
+        type: "Career",
+        title: "Senior Certification & Engineering License",
+        deadline: "2026-11-30",
+        budget: 5000,
+        saved: 2500,
+        monthlyTarget: 1250,
+        steps: [
+          { id: "s21", text: "Register for certification program", done: true },
+          { id: "s22", text: "Complete 40 hours of online coursework", done: false },
+          { id: "s23", text: "Pass official practice exam with >85%", done: false },
+          { id: "s24", text: "Schedule & pass final exam", done: false }
+        ]
+      }
+    ];
+
+    // Web Audio API Sound Synthesizer
+    let audioCtx = null;
+    let sfxEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSound(type) {
+      if (!sfxEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'complete') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'levelup') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(261.63, now);
+        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.5);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      }
+    }
+
+    // Canvas Particle FX for Level-Up
+    const canvas = document.getElementById('fxCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function triggerLevelUpFX() {
+      playSound('levelup');
+      particles = [];
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 15,
+          vy: (Math.random() - 0.5) * 15,
+          color: ['#00f0ff', '#ff0055', '#ffb703', '#ffffff'][Math.floor(Math.random() * 4)],
+          radius: Math.random() * 4 + 2,
+          alpha: 1
+        });
+      }
+      animateParticles();
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      particles.forEach(p => {
+        if (p.alpha > 0) {
+          alive = true;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= 0.015;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+      if (alive) requestAnimationFrame(animateParticles);
+    }
+
+    // State Initialization
+    let state = loadInitialState();
+    let selectedCategoryFilter = "ALL";
+    let searchQuery = "";
+
+    function loadInitialState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved) {
+          return {
+            xp: saved.xp || 0,
+            streak: saved.streak || 0,
+            lastActiveDate: saved.lastActiveDate || todayStr(),
+            mandatory: saved.mandatory && saved.mandatory.length ? saved.mandatory : DEFAULT_MANDATORY_TASKS,
+            daily: saved.daily || [],
+            monthly: saved.monthly || [],
+            goals: saved.goals && saved.goals.length ? saved.goals : DEFAULT_GOALS,
+            rewards: saved.rewards && saved.rewards.length ? saved.rewards : DEFAULT_REWARDS,
+            budget: saved.budget || null
+          };
+        }
+      } catch (e) {}
+      return {
+        xp: 0,
+        streak: 1,
+        lastActiveDate: todayStr(),
+        mandatory: DEFAULT_MANDATORY_TASKS,
+        daily: [],
+        monthly: [],
+        goals: DEFAULT_GOALS,
+        rewards: DEFAULT_REWARDS,
+        budget: null
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (window.saveToCloud) {
+        window.saveToCloud(state);
+      }
+    }
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    function safeText(str) {
+      return String(str || '').replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastMsg").textContent = msg;
+      toast.classList.remove("translate-y-20", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("translate-y-20", "opacity-0");
+      }, 2500);
+    }
+
+    // Player Title & Rank Calculator
+    function getLevelInfo(xp) {
+      const lvl = Math.floor(xp / 5000) + 1;
+      let rank = "RANK E";
+      let title = "Shadow Apprentice";
+      let classTitle = "Monk of Discipline";
+
+      if (lvl >= 20) { rank = "RANK SSS"; title = "Absolute Sovereign"; classTitle = "God of Iron Will"; }
+      else if (lvl >= 15) { rank = "RANK SS"; title = "Domain Master"; classTitle = "Grandmaster Sovereign"; }
+      else if (lvl >= 10) { rank = "RANK S"; title = "Iron Sovereign"; classTitle = "High Executioner"; }
+      else if (lvl >= 7) { rank = "RANK A"; title = "Shadow Hunter"; classTitle = "Discipline Knight"; }
+      else if (lvl >= 4) { rank = "RANK B"; title = "Vanguard Fighter"; classTitle = "Adept Warrior"; }
+      else if (lvl >= 2) { rank = "RANK C"; title = "Awakener"; classTitle = "Iron Operative"; }
+
+      return { lvl, rank, title, classTitle };
+    }
+
+    function checkLevelUp(oldXP, newXP) {
+      const oldInfo = getLevelInfo(oldXP);
+      const newInfo = getLevelInfo(newXP);
+      if (newInfo.lvl > oldInfo.lvl) {
+        triggerLevelUpFX();
+        document.getElementById("modalLevelTitle").textContent = `Level ${newInfo.lvl} (${newInfo.rank})`;
+        const reward = state.rewards.find(r => Number(r.level) === Number(newInfo.lvl));
+        document.getElementById("modalRewardText").textContent = reward ? reward.name : "Keep striving! (No custom reward for this level)";
+        document.getElementById("levelModal").classList.remove("hidden");
+      }
+    }
+
+    document.getElementById("closeModalBtn").addEventListener("click", () => {
+      document.getElementById("levelModal").classList.add("hidden");
+    });
+
+    // Populate Category Dropdowns
+    function setupCategories() {
+      const opts = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join("");
+      ["mandatoryCategory", "dailyCategory", "monthlyCategory"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = opts;
+      });
+    }
+
+    // Render Helpers
+    function passesFilter(item) {
+      const matchesCat = selectedCategoryFilter === "ALL" || item.category === selectedCategoryFilter;
+      const matchesSearch = !searchQuery || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) || (item.title && item.title.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchesCat && matchesSearch;
+    }
+
+    // TASK LIST RENDERER
+    function taskItemHTML(task, type) {
+      const isMandatory = type === "mandatory";
+      const isDaily = type === "daily" || isMandatory;
+      const isDone = isDaily ? task.completedOn === todayStr() : !!task.completed;
+
+      return `
+        <li class="flex items-center justify-between p-3 rounded-lg bg-slate-900/80 border ${isDone ? 'border-slate-800 opacity-60' : 'border-slate-700/60'} hover:border-hud-cyan/40 transition-all">
+          <div class="flex items-center gap-3 min-w-0 pr-2">
+            <button onclick="toggleTask('${type}', '${task.id}')" class="w-6 h-6 rounded flex items-center justify-center border ${isDone ? 'bg-hud-cyan border-hud-cyan text-slate-950' : 'border-slate-600 text-transparent hover:border-hud-cyan'}">
+              <i class="fa-solid fa-check text-xs"></i>
+            </button>
+            <div class="min-w-0">
+              <div class="text-xs font-medium text-white truncate ${isDone ? 'line-through text-slate-400' : ''}">
+                ${safeText(task.name)} 
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono ml-1">${task.category}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 font-rajdhani">
+                ${isDone ? 'Completed Today' : 'Ready'}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-xs font-orbitron font-bold ${isMandatory ? 'text-hud-crimson' : 'text-hud-cyan'}">+${task.xp} XP</span>
+            <button onclick="deleteTask('${type}', '${task.id}')" class="text-slate-600 hover:text-hud-crimson text-xs p-1">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </li>
+      `;
+    }
+
+    // MAIN RENDER FUNCTION
+    function render() {
+      // 1. Player Card & XP
+      const info = getLevelInfo(state.xp);
+      const level = info.lvl;
+      const currentXPWithin = state.xp % 5000;
+      const xpPct = (currentXPWithin / 5000) * 100;
+
+      document.getElementById("levelDisplay").textContent = level;
+      document.getElementById("rankBadge").textContent = info.rank;
+      document.getElementById("playerTitle").textContent = info.title;
+      document.getElementById("classTitle").textContent = info.classTitle;
+      document.getElementById("xpText").textContent = `${currentXPWithin.toLocaleString()} / 5,000 XP`;
+      document.getElementById("xpFill").style.width = `${xpPct}%`;
+      document.getElementById("totalXpDisplay").textContent = `Total Earned: ${state.xp.toLocaleString()} XP`;
+      document.getElementById("xpToNextDisplay").textContent = `${(5000 - currentXPWithin).toLocaleString()} XP to Level ${level + 1}`;
+      document.getElementById("streakDisplay").textContent = `${state.streak || 1} Days`;
+
+      // 2. Stats Counters
+      const mandatoryDoneCount = state.mandatory.filter(t => t.completedOn === todayStr()).length;
+      document.getElementById("mandatoryStat").textContent = `${mandatoryDoneCount}/${state.mandatory.length}`;
+      document.getElementById("dailyStat").textContent = state.daily.filter(t => t.completedOn === todayStr()).length;
+      document.getElementById("monthlyStat").textContent = state.monthly.filter(t => t.completed).length;
+
+      // 3. Dashboard Circular Ring & Summaries
+      const totalMandatory = state.mandatory.length || 50;
+      const mandatoryPct = Math.round((mandatoryDoneCount / totalMandatory) * 100);
+      document.getElementById("mandatoryPctText").textContent = `${mandatoryPct}%`;
+      document.getElementById("dashMandatoryCount").textContent = `${mandatoryDoneCount}/${totalMandatory}`;
+      
+      const circumference = 2 * Math.PI * 50; // 314.15
+      const offset = circumference - (mandatoryPct / 100) * circumference;
+      document.getElementById("mandatoryRing").style.strokeDashoffset = offset;
+
+      // Strategic Goals Dashboard summary
+      const activeGoals = state.goals.filter(passesFilter);
+      document.getElementById("dashGoalCount").textContent = `${state.goals.length} Active`;
+      document.getElementById("dashGoalSummary").innerHTML = state.goals.slice(0, 2).map(g => {
+        const totalS = g.steps ? g.steps.length : 0;
+        const doneS = g.steps ? g.steps.filter(s => s.done).length : 0;
+        const pct = totalS ? Math.round((doneS / totalS) * 100) : 0;
+        return `
+          <div class="bg-slate-900/80 p-2 rounded border border-slate-800">
+            <div class="flex justify-between font-semibold text-white">
+              <span class="truncate">${safeText(g.title)}</span>
+              <span class="text-hud-gold">${pct}%</span>
+            </div>
+            <div class="w-full h-1 bg-slate-800 rounded mt-1 overflow-hidden">
+              <div class="h-full bg-hud-gold" style="width:${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('') || '<p class="text-slate-500">No active goals configured.</p>';
+
+      // Rewards Dashboard Notice
+      const sortedRewards = [...state.rewards].sort((a,b) => a.level - b.level);
+      const nextReward = sortedRewards.find(r => r.level > level);
+      document.getElementById("dashRewardNotice").innerHTML = nextReward ? `
+        <div class="bg-slate-900 p-3 rounded border border-purple-500/40">
+          <span class="text-[10px] text-purple-400 font-mono block">LEVEL ${nextReward.level} REWARD</span>
+          <strong class="text-sm text-white font-orbitron">${safeText(nextReward.name)}</strong>
+        </div>
+      ` : `<p class="text-xs text-slate-400">All set milestone rewards achieved!</p>`;
+
+      // Daily Summary on Dashboard
+      document.getElementById("dashDailySummary").innerHTML = state.daily.filter(passesFilter).slice(0, 3).map(t => taskItemHTML(t, 'daily')).join('') || '<p class="text-slate-500">No daily quests added yet.</p>';
+
+      // Budget Summary on Dashboard
+      if (state.budget) {
+        document.getElementById("dashBudgetSummary").innerHTML = `
+          <div class="flex justify-between">
+            <span class="text-slate-400">Remaining Balance:</span>
+            <strong class="text-white">${formatMoney(state.budget.balance)}</strong>
+          </div>
+        `;
+      }
+
+      // 4. Render Mandatory Tasks Page (Grouped by Category)
+      document.getElementById("mandatoryHeaderProgress").textContent = `${mandatoryDoneCount} / ${totalMandatory} (${mandatoryPct}%)`;
+      const mandatoryContainer = document.getElementById("mandatoryListContainer");
+      mandatoryContainer.innerHTML = CATEGORIES.map(cat => {
+        if (selectedCategoryFilter !== "ALL" && selectedCategoryFilter !== cat) return "";
+        const catTasks = state.mandatory.filter(t => t.category === cat && passesFilter(t));
+        if (!catTasks.length) return "";
+        const catDone = catTasks.filter(t => t.completedOn === todayStr()).length;
+        return `
+          <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800">
+            <h3 class="font-orbitron font-bold text-xs text-hud-cyan mb-3 flex justify-between items-center border-b border-slate-800 pb-2">
+              <span><i class="fa-solid fa-layer-group text-slate-500 mr-2"></i>${cat.toUpperCase()} PROTOCOL</span>
+              <span class="font-mono text-slate-400">${catDone}/${catTasks.length} Done</span>
+            </h3>
+            <ul class="space-y-2">
+              ${catTasks.map(t => taskItemHTML(t, 'mandatory')).join('')}
+            </ul>
+          </div>
+        `;
+      }).join('') || '<p class="text-xs text-slate-500 p-4 text-center">No mandatory tasks match the criteria.</p>';
+
+      // 5. Render Dailies & Monthlies
+      document.getElementById("dailyList").innerHTML = state.daily.filter(passesFilter).map(t => taskItemHTML(t, 'daily')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No daily quests found.</li>';
+      document.getElementById("monthlyList").innerHTML = state.monthly.filter(passesFilter).map(t => taskItemHTML(t, 'monthly')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No monthly goals found.</li>';
+
+      // 6. Strategic Goals Cards
+      renderStrategicGoals();
+
+      // 7. Rewards Grid
+      document.getElementById("rewardsGrid").innerHTML = sortedRewards.map(r => {
+        const unlocked = level >= r.level;
+        return `
+          <div class="cyber-panel p-4 flex flex-col justify-between ${unlocked ? 'cyber-panel-gold' : ''}">
+            <div>
+              <span class="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded ${unlocked ? 'bg-hud-gold text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                LEVEL ${r.level} REWARD
+              </span>
+              <h4 class="font-orbitron font-bold text-white text-base mt-2">${safeText(r.name)}</h4>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+              <span class="${unlocked ? 'text-hud-gold font-bold' : 'text-slate-500'}">${unlocked ? 'UNLOCKED 🎉' : 'LOCKED'}</span>
+              <button onclick="deleteReward('${r.id}')" class="text-slate-600 hover:text-hud-crimson"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `;
+      }).join('') || '<p class="text-xs text-slate-500 col-span-3">No level rewards created.</p>';
+
+      // 8. Budget Page Calculations
+      renderBudgetPage();
+
+      // 9. Deliverables Overview
+      renderDeliverablesOverview();
+    }
+
+    // STRATEGIC GOALS CARD RENDERER
+    function renderStrategicGoals() {
+      const careerHost = document.getElementById("careerGoalsList");
+      const personalHost = document.getElementById("personalGoalsList");
+      
+      const careerGoals = state.goals.filter(g => g.type === "Career" && passesFilter(g));
+      const personalGoals = state.goals.filter(g => g.type === "Personal" && passesFilter(g));
+
+      const renderCard = (g) => {
+        const completedSteps = g.steps ? g.steps.filter(s => s.done).length : 0;
+        const totalSteps = g.steps ? g.steps.length : 0;
+        const pct = totalSteps ? Math.round((completedSteps / totalSteps) * 100) : 0;
+
+        const budget = Number(g.budget || 0);
+        const saved = Number(g.saved || 0);
+        const monthly = Number(g.monthlyTarget || 0);
+        const savingsPct = budget > 0 ? Math.min(100, Math.round((saved / budget) * 100)) : 0;
+
+        return `
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-lg space-y-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-orbitron font-bold text-white text-sm">${safeText(g.title)}</h4>
+                <span class="text-[10px] text-slate-400">Target: ${g.deadline || 'Flexible'}</span>
+              </div>
+              <button onclick="deleteGoal('${g.id}')" class="text-slate-600 hover:text-hud-crimson text-xs"><i class="fa-solid fa-trash"></i></button>
+            </div>
+
+            ${budget > 0 ? `
+              <div class="bg-slate-900/90 p-2.5 rounded border-l-2 border-hud-gold text-xs space-y-1">
+                <div class="flex justify-between font-rajdhani font-semibold">
+                  <span class="text-hud-gold">Savings Target: ${formatMoney(budget)}</span>
+                  <span class="text-emerald-400">Saved: ${formatMoney(saved)} (${savingsPct}%)</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-950 rounded overflow-hidden">
+                  <div class="h-full bg-hud-gold" style="width:${savingsPct}%"></div>
+                </div>
+                <div class="flex justify-between items-center text-[10px] text-slate-400 pt-1">
+                  <span>Monthly Goal: ${formatMoney(monthly)}/mo</span>
+                  <button onclick="addSavingsPrompt('${g.id}')" class="text-hud-gold hover:underline font-bold">+ Add Savings</button>
+                </div>
+              </div>
+            ` : ''}
+
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                <span>Action Plan (${completedSteps}/${totalSteps})</span>
+                <span class="text-hud-cyan">${pct}%</span>
+              </div>
+              <ul class="space-y-1 text-xs">
+                ${g.steps ? g.steps.map(s => `
+                  <li class="flex items-center gap-2">
+                    <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleStep('${g.id}', '${s.id}')" class="rounded accent-hud-cyan">
+                    <span class="${s.done ? 'line-through text-slate-500' : 'text-slate-300'}">${safeText(s.text)}</span>
+                  </li>
+                `).join('') : ''}
+              </ul>
+              <div class="flex gap-2 mt-2">
+                <input id="stepInput_${g.id}" type="text" placeholder="Add step..." class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white w-full">
+                <button onclick="addStep('${g.id}')" class="bg-slate-800 text-hud-cyan px-2 py-1 rounded text-xs font-bold hover:bg-slate-700">+ Step</button>
+              </div>
+            </div>
+          </div>
+        `;
+      };
+
+      careerHost.innerHTML = careerGoals.map(renderCard).join('') || '<p class="text-xs text-slate-500">No career goals created.</p>';
+      personalHost.innerHTML = personalGoals.map(renderCard).join('') || '<p class="text-xs text-slate-500">No personal goals created.</p>';
+    }
+
+    // BUDGET PAGE LOGIC
+    function renderBudgetPage() {
+      const b = state.budget;
+      if (!b) return;
+
+      document.getElementById("balanceInput").value = b.balance;
+      document.getElementById("spentInput").value = b.spent;
+
+      const now = new Date();
+      const daysElapsed = Math.max(1, now.getDate());
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const avgSpend = b.spent / daysElapsed;
+      const remainingDays = daysInMonth - daysElapsed;
+      const projected = b.balance - (avgSpend * remainingDays);
+
+      document.getElementById("budgetBalanceVal").textContent = formatMoney(b.balance);
+      document.getElementById("dailySpendVal").textContent = formatMoney(avgSpend);
+      
+      const projEl = document.getElementById("projectedBalanceVal");
+      projEl.textContent = formatMoney(projected);
+      projEl.className = projected < 0 ? "text-xl font-orbitron text-hud-crimson" : "text-xl font-orbitron text-emerald-400";
+    }
+
+    // DELIVERABLES OVERVIEW LOGIC
+    function renderDeliverablesOverview() {
+      const host = document.getElementById("deliverablesContainer");
+      host.innerHTML = CATEGORIES.map(cat => {
+        if (selectedCategoryFilter !== "ALL" && selectedCategoryFilter !== cat) return "";
+        const m = state.mandatory.filter(t => t.category === cat && passesFilter(t));
+        const d = state.daily.filter(t => t.category === cat && passesFilter(t));
+        const mo = state.monthly.filter(t => t.category === cat && passesFilter(t));
+
+        if (!m.length && !d.length && !mo.length) return "";
+
+        return `
+          <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+            <h3 class="font-orbitron font-bold text-sm text-hud-cyan mb-3 border-b border-slate-800 pb-2">${cat.toUpperCase()} CATEGORY DELIVERABLES</h3>
+            
+            ${m.length ? `<h4 class="text-xs font-bold text-hud-crimson uppercase mt-2 mb-1">Mandatory Protocol</h4>
+              <ul class="space-y-1 mb-3 text-xs text-slate-300">
+                ${m.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-crimson font-mono">+${t.xp} XP</span></li>`).join('')}
+              </ul>` : ''}
+
+            ${d.length ? `<h4 class="text-xs font-bold text-hud-cyan uppercase mt-2 mb-1">Daily Quests</h4>
+              <ul class="space-y-1 mb-3 text-xs text-slate-300">
+                ${d.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-cyan font-mono">+${t.xp} XP</span></li>`).join('')}
+              </ul>` : ''}
+
+            ${mo.length ? `<h4 class="text-xs font-bold text-hud-gold uppercase mt-2 mb-1">Monthly Objectives</h4>
+              <ul class="space-y-1 text-xs text-slate-300">
+                ${mo.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-gold font-mono">+${t.xp} XP</span></li>`).join('')}
+              </ul>` : ''}
+          </div>
+        `;
+      }).join('') || '<p class="text-xs text-slate-500 p-4">No deliverables match filter.</p>';
+    }
+
+    // EVENT HANDLERS & ACTIONS
+    function toggleTask(type, id) {
+      let arr = type === "mandatory" ? state.mandatory : (type === "daily" ? state.daily : state.monthly);
+      const task = arr.find(t => t.id === id);
+      if (!task) return;
+
+      const oldXP = state.xp;
+      const isDaily = type === "daily" || type === "mandatory";
+
+      if (isDaily) {
+        if (task.completedOn === todayStr()) {
+          task.completedOn = null;
+          state.xp = Math.max(0, state.xp - task.xp);
+          showToast("Task marked uncompleted");
+        } else {
+          task.completedOn = todayStr();
+          state.xp += task.xp;
+          playSound('complete');
+          showToast(`+${task.xp} XP Gained!`);
+          checkLevelUp(oldXP, state.xp);
+        }
+      } else {
+        task.completed = !task.completed;
+        if (task.completed) {
+          state.xp += task.xp;
+          playSound('complete');
+          showToast(`+${task.xp} XP Gained!`);
+          checkLevelUp(oldXP, state.xp);
+        } else {
+          state.xp = Math.max(0, state.xp - task.xp);
+          showToast("Task uncompleted");
+        }
+      }
+
+      saveState();
+      render();
+    }
+
+    function deleteTask(type, id) {
+      let arr = type === "mandatory" ? state.mandatory : (type === "daily" ? state.daily : state.monthly);
+      const index = arr.findIndex(t => t.id === id);
+      if (index >= 0) {
+        arr.splice(index, 1);
+        saveState();
+        render();
+        showToast("Task removed");
+      }
+    }
+
+    function addStep(goalId) {
+      const input = document.getElementById(`stepInput_${goalId}`);
+      const text = input.value.trim();
+      if (!text) return;
+      const g = state.goals.find(x => x.id === goalId);
+      if (g) {
+        if (!g.steps) g.steps = [];
+        g.steps.push({ id: uid(), text, done: false });
+        saveState();
+        render();
+      }
+    }
+
+    function toggleStep(goalId, stepId) {
+      const g = state.goals.find(x => x.id === goalId);
+      if (g && g.steps) {
+        const s = g.steps.find(x => x.id === stepId);
+        if (s) {
+          s.done = !s.done;
+          saveState();
+          render();
+        }
+      }
+    }
+
+    function addSavingsPrompt(goalId) {
+      const g = state.goals.find(x => x.id === goalId);
+      if (!g) return;
+      const amt = prompt(`Add savings amount for "${g.title}" (R):`, "1000");
+      if (amt && !isNaN(amt)) {
+        g.saved = (Number(g.saved) || 0) + Number(amt);
+        saveState();
+        render();
+        showToast("Savings updated!");
+      }
+    }
+
+    function deleteGoal(id) {
+      state.goals = state.goals.filter(g => g.id !== id);
+      saveState();
+      render();
+    }
+
+    function deleteReward(id) {
+      state.rewards = state.rewards.filter(r => r.id !== id);
+      saveState();
+      render();
+    }
+
+    // FORM SUBMISSIONS
+    document.getElementById("addMandatoryBtn").addEventListener("click", () => {
+      const name = document.getElementById("mandatoryName").value.trim();
+      const category = document.getElementById("mandatoryCategory").value;
+      const xp = Math.min(30, Math.max(1, Number(document.getElementById("mandatoryXP").value) || 25));
+      if (!name) return;
+      state.mandatory.push({ id: uid(), name, category, xp });
+      document.getElementById("mandatoryName").value = "";
+      saveState(); render(); showToast("Mandatory Habit added!");
+    });
+
+    document.getElementById("addDailyBtn").addEventListener("click", () => {
+      const name = document.getElementById("dailyName").value.trim();
+      const category = document.getElementById("dailyCategory").value;
+      const xp = Math.min(20, Math.max(1, Number(document.getElementById("dailyXP").value) || 10));
+      if (!name) return;
+      state.daily.push({ id: uid(), name, category, xp });
+      document.getElementById("dailyName").value = "";
+      saveState(); render(); showToast("Daily Quest added!");
+    });
+
+    document.getElementById("addMonthlyBtn").addEventListener("click", () => {
+      const name = document.getElementById("monthlyName").value.trim();
+      const category = document.getElementById("monthlyCategory").value;
+      const xp = Number(document.getElementById("monthlyXP").value) || 25;
+      if (!name) return;
+      state.monthly.push({ id: uid(), name, category, xp, completed: false });
+      document.getElementById("monthlyName").value = "";
+      saveState(); render(); showToast("Monthly Goal added!");
+    });
+
+    document.getElementById("addGoalBtn").addEventListener("click", () => {
+      const title = document.getElementById("goalTitle").value.trim();
+      const type = document.getElementById("goalType").value;
+      const deadline = document.getElementById("goalDeadline").value;
+      const budget = Number(document.getElementById("goalBudget").value) || 0;
+      const saved = Number(document.getElementById("goalSaved").value) || 0;
+      const monthlyTarget = Number(document.getElementById("goalMonthly").value) || 0;
+      if (!title) return;
+
+      state.goals.push({ id: uid(), title, type, deadline, budget, saved, monthlyTarget, steps: [] });
+      document.getElementById("goalTitle").value = "";
+      saveState(); render(); showToast("Strategic Goal created!");
+    });
+
+    document.getElementById("addRewardBtn").addEventListener("click", () => {
+      const level = Number(document.getElementById("rewardLevel").value);
+      const name = document.getElementById("rewardName").value.trim();
+      if (!level || !name) return;
+      state.rewards.push({ id: uid(), level, name });
+      document.getElementById("rewardName").value = "";
+      saveState(); render(); showToast("Milestone Reward set!");
+    });
+
+    document.getElementById("saveBudgetBtn").addEventListener("click", () => {
+      const balance = Number(document.getElementById("balanceInput").value) || 0;
+      const spent = Number(document.getElementById("spentInput").value) || 0;
+      state.budget = { balance, spent, month: monthKey() };
+      saveState(); render(); showToast("Budget Data Saved!");
+    });
+
+    // SEARCH & FILTER LISTENERS
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      render();
+    });
+
+    document.querySelectorAll(".cat-filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".cat-filter-btn").forEach(b => b.classList.remove("bg-hud-cyan", "text-slate-950", "active"));
+        document.querySelectorAll(".cat-filter-btn").forEach(b => b.classList.add("bg-slate-800", "text-slate-300"));
+        btn.classList.add("bg-hud-cyan", "text-slate-950", "active");
+        selectedCategoryFilter = btn.dataset.cat;
+        render();
+      });
+    });
+
+    // TAB SWITCHING LOGIC
+    function switchTab(pageId) {
+      playSound('click');
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        const isCurrent = btn.dataset.page === pageId;
+        btn.classList.toggle("bg-hud-cyan", isCurrent);
+        btn.classList.toggle("text-slate-950", isCurrent);
+        btn.classList.toggle("bg-hud-dark", !isCurrent);
+      });
+
+      document.querySelectorAll(".page-content").forEach(p => {
+        p.classList.toggle("hidden", p.id !== `page-${pageId}`);
+      });
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.page));
+    });
+
+    // SOUND TOGGLE
+    document.getElementById("soundToggleBtn").addEventListener("click", () => {
+      sfxEnabled = !sfxEnabled;
+      document.getElementById("soundIcon").className = sfxEnabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+      document.getElementById("soundLabel").textContent = sfxEnabled ? "SFX ON" : "SFX OFF";
+      if (sfxEnabled) playSound('click');
+    });
+
+    // BACKUP & RESTORE JSON FILE LOGIC
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `tatake_isekai_backup_${todayStr()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast("Backup exported successfully!");
+    });
+
+    document.getElementById("importBtn").addEventListener("click", () => {
+      document.getElementById("importFileInput").click();
+    });
+
+    document.getElementById("importFileInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const imported = JSON.parse(event.target.result);
+          if (imported && typeof imported === 'object') {
+            state = imported;
+            saveState();
+            render();
+            showToast("System State Restored!");
+          }
+        } catch (err) {
+          alert("Invalid backup JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // INITIALIZATION & CLOUD BRIDGE STARTUP
+    setupCategories();
+
+    // Init Firebase Bridge for multi-device cross-PC sync
+    if (window.FirebaseBridge) {
+      window.FirebaseBridge.init(
+        (remoteState) => {
+          // Cloud update received
+          state = remoteState;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          render();
+          showToast("Cloud State Synced Across Devices!");
+        },
+        (status) => {
+          const badge = document.getElementById("cloudStatusBadge");
+          const dot = document.getElementById("cloudDot");
+          const text = document.getElementById("cloudStatusText");
+
+          if (status.ready) {
+            dot.className = "w-2 h-2 rounded-full bg-hud-green shadow-[0_0_8px_#00ffaa]";
+            text.textContent = `Cloud Online (${status.userId.slice(0,5)}...)`;
+          } else {
+            dot.className = "w-2 h-2 rounded-full bg-slate-500";
+            text.textContent = status.message || "Local Mode";
+          }
+        }
+      );
+    }
+
+    render();
+  </script>
+</body>
+</html>
