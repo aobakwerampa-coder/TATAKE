@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TATAKE - System UI Overlay</title>
+  <title>TATAKE - System UI Overlay V9.0 Sovereign Edition</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Orbitron & Rajdhani & Inter -->
+  <!-- Google Fonts: Orbitron, Rajdhani & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -41,7 +41,6 @@
   </script>
 
   <style>
-    /* Custom Sci-Fi Hologram & Cyberpunk Styles */
     body {
       background-color: #040814;
       background-image: 
@@ -53,7 +52,6 @@
       overflow-x: hidden;
     }
 
-    /* Scanline overlay */
     .scanline {
       background: linear-gradient(
         to bottom,
@@ -66,7 +64,6 @@
       pointer-events: none;
     }
 
-    /* Cyber HUD Border Corners */
     .cyber-panel {
       position: relative;
       background: rgba(8, 16, 36, 0.75);
@@ -106,51 +103,12 @@
       transform: translateY(1px);
     }
 
-    /* Glowing animations */
-    @keyframes pulseGlow {
-      0%, 100% { filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6)); }
-      50% { filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.9)); }
-    }
-
-    .neon-text-cyan {
-      color: #00f0ff;
-      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
-    }
-
-    .neon-text-red {
-      color: #ff0055;
-      text-shadow: 0 0 8px rgba(255, 0, 85, 0.6);
-    }
-
-    .neon-text-gold {
-      color: #ffb703;
-      text-shadow: 0 0 8px rgba(255, 183, 3, 0.6);
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #040814;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e3a5f;
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #00f0ff;
-    }
-
-    /* Circular Progress Ring */
     .progress-ring__circle {
       transition: stroke-dashoffset 0.5s ease-in-out;
       transform: rotate(-90deg);
       transform-origin: 50% 50%;
     }
 
-    /* Confetti/Particle Canvas */
     #fxCanvas {
       position: fixed;
       top: 0;
@@ -160,7 +118,7 @@
       pointer-events: none;
       z-index: 9999;
     }
-    /* Accessibility: increase all Tailwind text scale sizes by approximately 2px */
+
     .text-xs { font-size: calc(0.75rem + 2px) !important; }
     .text-sm { font-size: calc(0.875rem + 2px) !important; }
     .text-base { font-size: calc(1rem + 2px) !important; }
@@ -171,11 +129,11 @@
     [class*="text-[11px]"] { font-size: 13px !important; }
   </style>
 
-  <!-- Firebase Scripts (Modular ES Modules approach for Cloud Sync) -->
+  <!-- Firebase Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     window.FirebaseBridge = {
       init: async function(onSyncCallback, onStatusCallback) {
@@ -206,10 +164,8 @@
               window.currentUserId = userId;
               onStatusCallback({ ready: true, userId: userId, message: "Cloud Sync Active" });
 
-              // Public/User doc path according to Rule 1
               const docRef = doc(db, 'artifacts', appId, 'users', userId, 'systemData', 'state');
 
-              // Realtime listener
               onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                   const cloudData = docSnap.data();
@@ -221,7 +177,6 @@
                 console.warn("Firestore listen error:", err);
               });
 
-              // Save function attached to window
               window.saveToCloud = async (dataPayload) => {
                 try {
                   await setDoc(docRef, { payload: dataPayload, updatedAt: new Date().toISOString() });
@@ -251,18 +206,30 @@
     <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-hud-cyan/30">
       <div class="flex items-center gap-3 text-center md:text-left">
         <div class="w-12 h-12 rounded-lg bg-hud-cyan/10 border border-hud-cyan flex items-center justify-center text-hud-cyan text-2xl shadow-[0_0_15px_rgba(0,240,255,0.4)]">
-          <i class="fa-solid fa-bolt-lightning"></i>
+          <i class="fa-solid fa-crown"></i>
         </div>
         <div>
           <h1 class="font-orbitron text-2xl sm:text-3xl font-black tracking-widest text-white flex items-center gap-2">
-            TATAKE <span class="text-xs px-2 py-0.5 rounded bg-hud-crimson text-white font-rajdhani font-bold">SYSTEM V7.0</span>
+            TATAKE <span class="text-xs px-2 py-0.5 rounded bg-hud-cyan text-slate-950 font-rajdhani font-bold">SOVEREIGN V9.0</span>
           </h1>
-          <p class="text-xs text-hud-cyan/80 font-rajdhani tracking-wider uppercase">Iron Discipline Habit Protocol & Leveler HUD</p>
+          <p class="text-xs text-hud-cyan/80 font-rajdhani tracking-wider uppercase">Iron Discipline Protocol & Sovereign HUD</p>
         </div>
       </div>
 
-      <!-- SYSTEM CONTROLS & CLOUD STATUS -->
-      <div class="flex items-center gap-3 flex-wrap justify-center">
+      <!-- SYSTEM CONTROLS, STRICT MODE & CLOUD STATUS -->
+      <div class="flex items-center gap-2.5 flex-wrap justify-center">
+        <!-- Daily Rollover Trigger -->
+        <button id="dailyRolloverBtn" onclick="triggerDailyRollover()" class="cyber-btn bg-hud-dark border border-amber-400/50 px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-amber-300 hover:bg-amber-400/20 flex items-center gap-1.5" title="Reset daily completions for the new day">
+          <i class="fa-solid fa-rotate text-amber-400"></i>
+          <span>DAILY ROLLOVER</span>
+        </button>
+
+        <!-- Strict Mode Toggle -->
+        <button id="strictModeBtn" onclick="toggleStrictMode()" class="cyber-btn bg-hud-dark border border-slate-700 px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-slate-400 hover:border-hud-crimson flex items-center gap-1.5">
+          <i class="fa-solid fa-skull" id="strictModeIcon"></i>
+          <span id="strictModeLabel">STRICT: OFF</span>
+        </button>
+
         <!-- Sound Toggle -->
         <button id="soundToggleBtn" class="cyber-btn bg-hud-dark border border-hud-cyan/40 px-3 py-1.5 rounded text-xs font-rajdhani font-semibold text-hud-cyan hover:bg-hud-cyan/20 flex items-center gap-1.5">
           <i class="fa-solid fa-volume-high" id="soundIcon"></i>
@@ -275,7 +242,7 @@
           <span class="text-slate-300" id="cloudStatusText">Connecting Cloud...</span>
         </div>
 
-        <!-- Export / Import Modals Trigger -->
+        <!-- Export / Import Controls -->
         <div class="flex items-center gap-1.5">
           <button id="exportBtn" title="Export Backup JSON" class="cyber-btn bg-hud-dark border border-slate-600 px-2.5 py-1.5 rounded text-xs text-slate-300 hover:text-hud-cyan hover:border-hud-cyan">
             <i class="fa-solid fa-download"></i> Backup
@@ -292,7 +259,7 @@
     <section class="cyber-panel p-5 mb-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         
-        <!-- Avatar & Rank Section -->
+        <!-- Avatar, Name & Single-Use Lock Section -->
         <div class="lg:col-span-4 flex items-center gap-4 border-b lg:border-b-0 lg:border-r border-hud-cyan/20 pb-4 lg:pb-0 lg:pr-4">
           <div class="relative">
             <div class="w-20 h-20 rounded-xl bg-slate-900 border-2 border-hud-cyan flex items-center justify-center text-hud-cyan text-4xl shadow-[0_0_20px_rgba(0,240,255,0.3)]">
@@ -302,14 +269,26 @@
               RANK E
             </div>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span id="playerTitle" class="text-xs font-orbitron font-semibold text-hud-gold uppercase tracking-wider">Aobie The Beast</span>
-              <span class="text-[10px] px-1.5 py-0.2 bg-hud-cyan/20 text-hud-cyan rounded border border-hud-cyan/40 font-mono">Aobie #01</span>
+          <div class="flex-1">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span id="playerTitle" class="text-xs font-orbitron font-semibold text-hud-gold uppercase tracking-wider">BEAST MODE</span>
+                <span class="text-[10px] px-1.5 py-0.2 bg-hud-cyan/20 text-hud-cyan rounded border border-hud-cyan/40 font-mono">Aobie #01</span>
+              </div>
+              <button id="titleLockButton" onclick="handleTitleLockToggle()" class="text-xs font-orbitron font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400 hover:bg-amber-500/30">
+                <i class="fa-solid fa-lock-open mr-1"></i> LOCK TITLE (1-USE)
+              </button>
             </div>
-            <h2 class="text-xl sm:text-2xl font-orbitron font-black text-white" id="playerNameDisplay">DISCIPLINE JOURNEY </h2>
+
+            <!-- Editable / Locked Name Header -->
+            <div class="mt-1 flex items-center gap-2">
+              <h2 class="text-xl sm:text-2xl font-orbitron font-black text-white" id="playerNameDisplay">DISCIPLINE SOVEREIGN</h2>
+              <button id="editNameBtn" onclick="editPlayerName()" class="text-hud-cyan hover:text-white text-xs"><i class="fa-solid fa-pen"></i></button>
+            </div>
+
             <div class="flex items-center gap-3 text-xs text-slate-400 font-rajdhani mt-1">
-              <span><i class="fa-solid fa-fire text-hud-crimson mr-1"></i>Streak: <strong id="streakDisplay" class="text-white">0 Days</strong></span>
+              <span><i class="fa-solid fa-fire text-hud-crimson mr-1"></i>Streak: <strong id="streakDisplay" class="text-white">1 Day</strong></span>
+              <span><i class="fa-solid fa-bolt text-hud-gold mr-1"></i>Multiplier: <strong id="multiplierDisplay" class="text-hud-gold">1.0x</strong></span>
               <span><i class="fa-solid fa-shield-halved text-hud-cyan mr-1"></i>Class: <strong id="classTitle" class="text-hud-cyan">Monk of Iron</strong></span>
             </div>
           </div>
@@ -362,6 +341,12 @@
       <button class="tab-btn cyber-btn bg-hud-dark border border-hud-cyan/40 text-hud-cyan hover:bg-hud-cyan/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="daily">
         <i class="fa-solid fa-calendar-day mr-1.5"></i> Daily Quests
       </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="tasklists">
+        <i class="fa-solid fa-list-check mr-1.5"></i> Task Checklists
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-amber-500/50 text-amber-400 hover:bg-amber-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="timer">
+        <i class="fa-solid fa-hourglass-half mr-1.5"></i> ⏱ Focus Timer
+      </button>
       <button class="tab-btn cyber-btn bg-hud-dark border border-slate-700 text-slate-300 hover:border-hud-cyan font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="monthly">
         <i class="fa-solid fa-calendar-check mr-1.5"></i> Monthly Goals
       </button>
@@ -371,6 +356,9 @@
       <button class="tab-btn cyber-btn bg-hud-dark border border-purple-500/50 text-purple-400 hover:bg-purple-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="rewards">
         <i class="fa-solid fa-gift mr-1.5"></i> Level Rewards
       </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="audit">
+        <i class="fa-solid fa-book-journal-whills mr-1.5"></i> Audit & Log
+      </button>
       <button class="tab-btn cyber-btn bg-hud-dark border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="budget">
         <i class="fa-solid fa-wallet mr-1.5"></i> Budget
       </button>
@@ -379,7 +367,7 @@
       </button>
     </nav>
 
-    <!-- SEARCH & CATEGORY FILTER BAR (GLOBAL FOR LISTS) -->
+    <!-- SEARCH & CATEGORY FILTER BAR -->
     <div id="filterBar" class="cyber-panel p-3 mb-6 flex flex-col md:flex-row items-center justify-between gap-3">
       <div class="relative w-full md:w-72">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
@@ -400,6 +388,36 @@
 
     <!-- PAGE 1: DASHBOARD -->
     <section id="page-dashboard" class="page-content space-y-6">
+      
+      <!-- DISCIPLINE HEATMAP (PAST 30 DAYS) -->
+      <div class="cyber-panel p-5">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-700/60 pb-2">
+          <h3 class="font-orbitron font-bold text-white text-base flex items-center gap-2">
+            <i class="fa-solid fa-calendar-days text-hud-green"></i> 30-DAY DISCIPLINE HEATMAP
+          </h3>
+          <span class="text-xs text-slate-400 font-mono" id="heatmapSummary">0 tasks completed in 30 days</span>
+        </div>
+        <div id="disciplineHeatmap" class="grid grid-cols-10 sm:grid-cols-15 md:grid-cols-30 gap-1.5 py-2"></div>
+        <div class="flex items-center justify-end gap-2 text-[10px] text-slate-400 mt-2 font-mono">
+          <span>Less</span>
+          <span class="w-3 h-3 rounded-sm bg-slate-900 border border-slate-800"></span>
+          <span class="w-3 h-3 rounded-sm bg-cyan-950 border border-cyan-800"></span>
+          <span class="w-3 h-3 rounded-sm bg-cyan-700"></span>
+          <span class="w-3 h-3 rounded-sm bg-hud-cyan"></span>
+          <span class="w-3 h-3 rounded-sm bg-hud-green"></span>
+          <span>More Execution</span>
+        </div>
+      </div>
+
+      <div class="cyber-panel cyber-panel-red p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div><h3 class="font-orbitron font-bold text-white text-base"><i class="fa-solid fa-calendar-day text-hud-crimson mr-2"></i>MISSION CONTROL</h3>
+          <p class="text-xs text-slate-400">Deadlines and incomplete tasks that need attention.</p></div>
+          <button type="button" onclick="switchTab('deliverables')" class="cyber-btn bg-slate-800 border border-slate-600 px-3 py-2 rounded text-xs text-hud-cyan">VIEW TASKS</button>
+        </div>
+        <div id="dueOverview" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
         <!-- Mandatory Circular Widget -->
@@ -434,9 +452,7 @@
               </h3>
               <span class="text-xs text-hud-gold font-mono" id="dashGoalCount">0 Active</span>
             </div>
-            <div id="dashGoalSummary" class="space-y-3 my-2 text-xs">
-              <!-- Dynamic inserted goals snapshot -->
-            </div>
+            <div id="dashGoalSummary" class="space-y-3 my-2 text-xs"></div>
           </div>
           <div class="pt-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-400">
             <span>Career & Personal Roadmaps</span>
@@ -452,9 +468,7 @@
                 <i class="fa-solid fa-trophy text-purple-400"></i> Next Level Reward
               </h3>
             </div>
-            <div id="dashRewardNotice" class="my-3">
-              <!-- Dynamic inserted next reward -->
-            </div>
+            <div id="dashRewardNotice" class="my-3"></div>
           </div>
           <div class="pt-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-400">
             <span>Milestone Incentive</span>
@@ -467,9 +481,7 @@
           <h3 class="font-orbitron font-bold text-white text-base mb-3 flex items-center gap-2">
             <i class="fa-solid fa-list-check text-hud-cyan"></i> Daily Quests Progress
           </h3>
-          <div id="dashDailySummary" class="space-y-2 text-xs">
-            <!-- Dynamic Daily Quests -->
-          </div>
+          <div id="dashDailySummary" class="space-y-2 text-xs"></div>
         </div>
 
         <!-- Budget Quick Snapshot -->
@@ -493,7 +505,7 @@
             <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
               <i class="fa-solid fa-bolt text-hud-crimson"></i> 50 MANDATORY HABITS
             </h2>
-            <p class="text-xs text-slate-400">Strict Non-negotiable Protocol. High priority discipline habits (Up to 30 XP each).</p>
+            <p class="text-xs text-slate-400">Strict Non-negotiable Protocol. High priority discipline habits.</p>
           </div>
           <div class="text-right">
             <span class="text-xs text-slate-400 font-mono">Today's Progress</span>
@@ -505,21 +517,26 @@
         <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
           <h4 class="text-xs font-orbitron text-hud-cyan mb-2 uppercase">Create Custom Mandatory Task</h4>
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-            <input id="mandatoryName" type="text" placeholder="e.g. Cold Plunge 3 Minutes" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
-            <select id="mandatoryCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
-            <input id="mandatoryXP" type="number" min="1" max="30" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <input id="mandatoryName" type="text" placeholder="e.g. Cold Plunge 3 Minutes" class="sm:col-span-4 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <select id="mandatoryCategory" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
+            <input id="mandatoryXP" type="number" min="1" max="50" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
             <input id="mandatoryDue" type="date" title="Due date" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
             <select id="mandatoryPeriod" title="Task period" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"><option value="morning">Morning</option><option value="afternoon">Afternoon</option></select>
-            <button id="addMandatoryBtn" class="sm:col-span-2 cyber-btn bg-hud-crimson text-white font-orbitron text-xs font-bold py-2 rounded">
-              + ADD
-            </button>
+            
+            <div class="sm:col-span-12 flex items-center justify-between pt-2">
+              <label class="flex items-center gap-2 text-xs text-amber-300 font-bold">
+                <input type="checkbox" id="mandatoryIsMajor" class="accent-amber-400 rounded">
+                <i class="fa-solid fa-star"></i> MAJOR TASK (2X XP BOOST)
+              </label>
+              <button id="addMandatoryBtn" class="cyber-btn bg-hud-crimson text-white font-orbitron text-xs font-bold px-6 py-2 rounded">
+                + ADD MANDATORY
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Mandatory Grouped List -->
-        <div id="mandatoryListContainer" class="space-y-6">
-          <!-- Rendered via JS -->
-        </div>
+        <div id="mandatoryListContainer" class="space-y-6"></div>
       </div>
     </section>
 
@@ -529,7 +546,7 @@
         <div class="flex justify-between items-center mb-4 border-b border-hud-cyan/30 pb-3">
           <div>
             <h2 class="font-orbitron font-extrabold text-xl text-white">DAILY QUESTS</h2>
-            <p class="text-xs text-slate-400">Repeatable routine tasks (1 to 20 XP per quest).</p>
+            <p class="text-xs text-slate-400">Repeatable routine tasks & quests.</p>
           </div>
           <span class="text-xs text-hud-cyan font-mono" id="dailyDateLabel">Today</span>
         </div>
@@ -537,15 +554,23 @@
         <!-- Add Daily Form -->
         <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-            <input id="dailyName" type="text" placeholder="e.g. 30-min Cardio Session" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
-            <select id="dailyCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
-            <input id="dailyXP" type="number" min="1" max="20" value="10" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <input id="dailyName" type="text" placeholder="e.g. 30-min Cardio Session" class="sm:col-span-4 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <select id="dailyCategory" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
+            <input id="dailyXP" type="number" min="1" max="50" value="10" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
             <input id="dailyDue" type="date" title="Due date" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
             <select id="dailyPeriod" title="Task period" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"><option value="morning">Morning</option><option value="afternoon">Afternoon</option></select>
-            <textarea id="dailySubtasks" placeholder="Morning task checklist (one sub-task per line; optional)" rows="2" class="sm:col-span-10 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"></textarea>
-            <button id="addDailyBtn" class="sm:col-span-2 cyber-btn bg-hud-cyan text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
-              + ADD QUEST
-            </button>
+            
+            <textarea id="dailySubtasks" placeholder="Task checklist (one sub-task per line; optional)" rows="2" class="sm:col-span-12 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"></textarea>
+            
+            <div class="sm:col-span-12 flex items-center justify-between pt-2">
+              <label class="flex items-center gap-2 text-xs text-amber-300 font-bold">
+                <input type="checkbox" id="dailyIsMajor" class="accent-amber-400 rounded">
+                <i class="fa-solid fa-star"></i> MAJOR QUEST (2X XP BOOST)
+              </label>
+              <button id="addDailyBtn" class="cyber-btn bg-hud-cyan text-slate-950 font-orbitron text-xs font-bold px-6 py-2 rounded">
+                + ADD QUEST
+              </button>
+            </div>
           </div>
         </div>
 
@@ -554,9 +579,72 @@
           <button type="button" data-period="afternoon" class="period-filter cyber-btn bg-slate-800 text-slate-200 px-4 py-2 rounded text-xs font-bold">Afternoon</button>
           <button type="button" data-period="all" class="period-filter cyber-btn bg-slate-800 text-slate-200 px-4 py-2 rounded text-xs font-bold">All Tasks</button>
         </div>
-        <ul id="dailyList" class="space-y-2">
-          <!-- Rendered via JS -->
-        </ul>
+        <ul id="dailyList" class="space-y-2"></ul>
+      </div>
+    </section>
+
+    <!-- TASK CHECKLIST TAB -->
+    <section id="page-tasklists" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="font-orbitron font-extrabold text-xl text-white">TASK CHECKLISTS</h2>
+            <p class="text-xs text-slate-400">Directly connected to main tasks. Progress is tracked in real-time across both views.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <label for="taskListGrouping" class="text-xs text-slate-400">Group by</label>
+            <select id="taskListGrouping" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
+              <option value="period">Morning / Afternoon</option>
+              <option value="due">Due date</option>
+            </select>
+            <label for="taskListStatus" class="text-xs text-slate-400">Show</label>
+            <select id="taskListStatus" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
+              <option value="all">All checklists</option>
+              <option value="open">Incomplete</option>
+              <option value="done">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div id="taskChecklistSummary" class="text-xs text-slate-400 mb-4"></div>
+        <div id="taskChecklistGroups" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- FOCUS / POMODORO TIMER TAB -->
+    <section id="page-timer" class="page-content hidden space-y-6">
+      <div class="cyber-panel cyber-panel-gold p-6 text-center">
+        <div class="max-w-md mx-auto">
+          <h2 class="font-orbitron font-extrabold text-2xl text-white mb-1 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-hourglass-half text-hud-gold"></i> FOCUS TIMER HUD
+          </h2>
+          <p class="text-xs text-slate-400 mb-6">Uninterrupted deep work blocks. Link your tasks directly.</p>
+
+          <!-- Timer Clock Display -->
+          <div class="bg-slate-950/80 border-2 border-hud-gold rounded-2xl p-6 mb-6 shadow-[0_0_30px_rgba(255,183,3,0.15)]">
+            <span id="timerModeLabel" class="text-xs font-orbitron text-hud-gold font-bold tracking-widest uppercase block mb-1">FOCUS BLOCK</span>
+            <div id="timerDisplay" class="font-orbitron text-5xl sm:text-6xl font-black text-white tracking-widest my-2">25:00</div>
+            
+            <div class="flex items-center justify-center gap-3 mt-4">
+              <button id="timerStartBtn" onclick="toggleTimer()" class="cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-black px-6 py-2.5 rounded tracking-wider">
+                <i class="fa-solid fa-play mr-1"></i> START FOCUS
+              </button>
+              <button id="timerResetBtn" onclick="resetTimer()" class="cyber-btn bg-slate-800 text-slate-300 font-orbitron text-xs font-bold px-4 py-2.5 rounded">
+                RESET
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Task Selector for Session -->
+          <div class="bg-slate-900 border border-slate-800 p-4 rounded-lg text-left">
+            <label class="block text-xs font-orbitron text-hud-cyan mb-2">LINK ACTIVE FOCUS TASK</label>
+            <select id="timerTaskSelect" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-hud-cyan mb-3">
+              <option value="">Select a task to execute during session...</option>
+            </select>
+            <button onclick="completeTimerSelectedTask()" class="w-full cyber-btn bg-hud-cyan text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
+              COMPLETE LINKED TASK NOW
+            </button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -565,26 +653,31 @@
       <div class="cyber-panel p-6">
         <div class="mb-4 border-b border-slate-700 pb-3">
           <h2 class="font-orbitron font-extrabold text-xl text-white">MONTHLY OBJECTIVES</h2>
-          <p class="text-xs text-slate-400">Major monthly milestones. Awarded upon completion.</p>
+          <p class="text-xs text-slate-400">Major monthly milestones awarded upon completion.</p>
         </div>
 
         <!-- Add Monthly Form -->
         <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-            <input id="monthlyName" type="text" placeholder="e.g. Finish Reading 2 Technical Books" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
-            <select id="monthlyCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
-            <input id="monthlyXP" type="number" min="1" max="50" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <input id="monthlyName" type="text" placeholder="e.g. Finish Reading 2 Technical Books" class="sm:col-span-4 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <select id="monthlyCategory" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
+            <input id="monthlyXP" type="number" min="1" max="100" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
             <input id="monthlyDue" type="date" title="Due date" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
             <select id="monthlyPeriod" title="Task period" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"><option value="morning">Morning</option><option value="afternoon">Afternoon</option></select>
-            <button id="addMonthlyBtn" class="sm:col-span-2 cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
-              + ADD GOAL
-            </button>
+            
+            <div class="sm:col-span-12 flex items-center justify-between pt-2">
+              <label class="flex items-center gap-2 text-xs text-amber-300 font-bold">
+                <input type="checkbox" id="monthlyIsMajor" class="accent-amber-400 rounded">
+                <i class="fa-solid fa-star"></i> MAJOR GOAL (2X XP BOOST)
+              </label>
+              <button id="addMonthlyBtn" class="cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-bold px-6 py-2 rounded">
+                + ADD GOAL
+              </button>
+            </div>
           </div>
         </div>
 
-        <ul id="monthlyList" class="space-y-2">
-          <!-- Rendered via JS -->
-        </ul>
+        <ul id="monthlyList" class="space-y-2"></ul>
       </div>
     </section>
 
@@ -596,7 +689,7 @@
             <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
               <i class="fa-solid fa-bullseye text-hud-gold"></i> STRATEGIC ROADMAPS & GOALS
             </h2>
-            <p class="text-xs text-slate-400">High-level Career & Personal Goals with attached financial targets and action plan steps.</p>
+            <p class="text-xs text-slate-400">High-level Career & Personal Goals with financial targets and action plans.</p>
           </div>
         </div>
 
@@ -604,7 +697,7 @@
         <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6 space-y-3">
           <h4 class="text-xs font-orbitron text-hud-gold uppercase">New Strategic Roadmap</h4>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input id="goalTitle" type="text" placeholder="Goal Title (e.g. Body Repair / Senior Certification)" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
+            <input id="goalTitle" type="text" placeholder="Goal Title (e.g. Senior Certification)" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
             <select id="goalType" class="bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-gold">
               <option value="Personal">Personal Goal</option>
               <option value="Career">Career Goal</option>
@@ -639,39 +732,71 @@
       </div>
     </section>
 
-    <!-- PAGE 6: REWARDS -->
+    <!-- PAGE 6: EDITABLE LEVEL REWARDS -->
     <section id="page-rewards" class="page-content hidden space-y-6">
       <div class="cyber-panel p-6">
-        <div class="mb-4 border-b border-purple-500/30 pb-3">
-          <h2 class="font-orbitron font-extrabold text-xl text-white">LEVEL MILESTONE REWARDS</h2>
-          <p class="text-xs text-slate-400">Define real-world unlocks achieved upon leveling up.</p>
+        <div class="mb-4 border-b border-purple-500/30 pb-3 flex justify-between items-center">
+          <div>
+            <h2 class="font-orbitron font-extrabold text-xl text-white">LEVEL MILESTONE REWARDS</h2>
+            <p class="text-xs text-slate-400">Configure and edit custom unlocks granted upon leveling up.</p>
+          </div>
         </div>
 
         <!-- Reward Add Form -->
         <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6">
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <input id="rewardLevel" type="number" min="2" placeholder="Level Req (e.g. 5)" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
-            <input id="rewardName" type="text" placeholder="Reward Description (e.g. Spa Day / New Gaming Setup)" class="sm:col-span-6 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+            <input id="rewardName" type="text" placeholder="Reward Description (e.g. Spa Day / New Setup)" class="sm:col-span-6 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
             <button id="addRewardBtn" class="sm:col-span-3 cyber-btn bg-purple-600 text-white font-orbitron text-xs font-bold py-2 rounded">
               SET REWARD
             </button>
           </div>
         </div>
 
-        <div id="rewardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Rendered via JS -->
+        <div id="rewardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- SYSTEM AUDIT LOG & JOURNAL -->
+    <section id="page-audit" class="page-content hidden space-y-6">
+      <div class="cyber-panel p-6">
+        <div class="mb-4 border-b border-cyan-500/30 pb-3">
+          <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
+            <i class="fa-solid fa-book-journal-whills text-hud-cyan"></i> SYSTEM AUDIT LOG & JOURNAL
+          </h2>
+          <p class="text-xs text-slate-400">Log daily discipline retrospectives and track lifetime XP transactions.</p>
+        </div>
+
+        <!-- Journal Entry Creator -->
+        <div class="bg-slate-900/90 border border-slate-700/80 p-4 rounded-lg mb-6 space-y-3">
+          <h4 class="text-xs font-orbitron text-hud-cyan uppercase">Daily Discipline Retrospective</h4>
+          <textarea id="journalInput" rows="3" placeholder="Record wins, failures, mindset insights, or lessons learned today..." class="w-full bg-slate-950 border border-slate-700 rounded p-3 text-xs text-white focus:outline-none focus:border-hud-cyan"></textarea>
+          <button onclick="saveJournalEntry()" class="cyber-btn bg-hud-cyan text-slate-950 font-orbitron text-xs font-bold px-5 py-2 rounded">
+            LOG RETROSPECTIVE
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-orbitron text-sm font-bold text-white border-b border-slate-800 pb-2 mb-3">RETROSPECTIVE JOURNAL</h3>
+            <div id="journalList" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
+          </div>
+          <div>
+            <h3 class="font-orbitron text-sm font-bold text-white border-b border-slate-800 pb-2 mb-3">XP SYSTEM HISTORY</h3>
+            <div id="xpHistoryList" class="space-y-2 max-h-96 overflow-y-auto pr-1 text-xs"></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- PAGE 7: BUDGET TRACKER -->
+    <!-- PAGE 8: BUDGET TRACKER -->
     <section id="page-budget" class="page-content hidden space-y-6">
       <div class="cyber-panel p-6">
         <div class="mb-4 border-b border-emerald-500/30 pb-3">
           <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
             <i class="fa-solid fa-wallet text-emerald-400"></i> MONTHLY BUDGET & VELOCITY TRACKER
           </h2>
-          <p class="text-xs text-slate-400">Monitor spending speed and project end-of-month balances.</p>
+          <p class="text-xs text-slate-400">Monitor daily spending speed and projected end-of-month balance.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -712,17 +837,15 @@
       </div>
     </section>
 
-    <!-- PAGE 8: DELIVERABLES OVERVIEW -->
+    <!-- PAGE 9: DELIVERABLES OVERVIEW -->
     <section id="page-deliverables" class="page-content hidden space-y-6">
       <div class="cyber-panel p-6">
         <div class="mb-4 border-b border-slate-700 pb-3">
           <h2 class="font-orbitron font-extrabold text-xl text-white">CONSOLIDATED DELIVERABLES</h2>
-          <p class="text-xs text-slate-400">Master inventory view of all active habits, daily quests, and monthly goals sorted by category.</p>
+          <p class="text-xs text-slate-400">Master inventory view of active habits, daily quests, and monthly goals sorted by category.</p>
         </div>
 
-        <div id="deliverablesContainer" class="space-y-6">
-          <!-- Rendered via JS -->
-        </div>
+        <div id="deliverablesContainer" class="space-y-6"></div>
       </div>
     </section>
 
@@ -730,7 +853,7 @@
 
   <!-- LEVEL UP CELEBRATION MODAL -->
   <div id="levelModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="cyber-panel cyber-panel-gold max-w-md w-full p-8 text-center relative animate-bounce-short">
+    <div class="cyber-panel cyber-panel-gold max-w-md w-full p-8 text-center relative">
       <div class="w-16 h-16 bg-hud-gold/20 text-hud-gold rounded-full border border-hud-gold flex items-center justify-center text-3xl mx-auto mb-4 shadow-[0_0_20px_rgba(255,183,3,0.5)]">
         <i class="fa-solid fa-crown"></i>
       </div>
@@ -755,76 +878,75 @@
     <span id="toastMsg">Action recorded</span>
   </div>
 
-  <!-- JS CONTROLLER & LOGIC -->
+  <!-- JS CONTROLLER & ENGINE -->
   <script>
-    // System Constants & Defaults
     const CATEGORIES = ["Gym", "Evolution", "Work", "Finance", "Socialise"];
-    const STORAGE_KEY = "tatake_isekai_v7";
-    const todayStr = () => new Date().toISOString().slice(0, 10);
-    const monthKey = () => new Date().toISOString().slice(0, 7);
+    const STORAGE_KEY = "tatake_isekai_v9_sovereign";
+    const localDateStr = (date = new Date()) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    };
+    const todayStr = () => localDateStr();
+    const monthKey = () => todayStr().slice(0, 7);
     const formatMoney = n => "R" + Number(n || 0).toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 50 DEFAULT MANDATORY HABITS (Capped max 30 XP)
     const DEFAULT_MANDATORY_TASKS = [
-      // Gym / Fitness (10)
-      { id: "m1", name: "100 Push-ups Daily Challenge", category: "Gym", xp: 30 },
-      { id: "m2", name: "5km Morning Run / Cardio", category: "Gym", xp: 30 },
-      { id: "m3", name: "Heavy Compound Lifting Session", category: "Gym", xp: 30 },
-      { id: "m4", name: "10 Minutes Core & Ab Conditioning", category: "Gym", xp: 20 },
-      { id: "m5", name: "Cold Shower Post-Workout", category: "Gym", xp: 20 },
-      { id: "m6", name: "Full Body Mobility & Stretching", category: "Gym", xp: 20 },
-      { id: "m7", name: "Drink 3 Liters of Water Daily", category: "Gym", xp: 20 },
-      { id: "m8", name: "10,000 Steps Daily Walk", category: "Gym", xp: 25 },
-      { id: "m9", name: "High-Protein Meal Prep & Clean Eating", category: "Gym", xp: 25 },
-      { id: "m10", name: "Strict 8 Hours Sleep Schedule", category: "Gym", xp: 30 },
+      { id: "m1", name: "100 Push-ups Daily Challenge", category: "Gym", xp: 30, isMajor: false },
+      { id: "m2", name: "5km Morning Run / Cardio", category: "Gym", xp: 30, isMajor: false },
+      { id: "m3", name: "Heavy Compound Lifting Session", category: "Gym", xp: 30, isMajor: true },
+      { id: "m4", name: "10 Minutes Core & Ab Conditioning", category: "Gym", xp: 20, isMajor: false },
+      { id: "m5", name: "Cold Shower Post-Workout", category: "Gym", xp: 20, isMajor: false },
+      { id: "m6", name: "Full Body Mobility & Stretching", category: "Gym", xp: 20, isMajor: false },
+      { id: "m7", name: "Drink 3 Liters of Water Daily", category: "Gym", xp: 20, isMajor: false },
+      { id: "m8", name: "10,000 Steps Daily Walk", category: "Gym", xp: 25, isMajor: false },
+      { id: "m9", name: "High-Protein Meal Prep & Clean Eating", category: "Gym", xp: 25, isMajor: false },
+      { id: "m10", name: "Strict 8 Hours Sleep Schedule", category: "Gym", xp: 30, isMajor: false },
 
-      // Evolution / Mindset (10)
-      { id: "m11", name: "30 Minutes Deep Reading (Self-Mastery/Tech)", category: "Evolution", xp: 30 },
-      { id: "m12", name: "15 Minutes Mindfulness Meditation", category: "Evolution", xp: 20 },
-      { id: "m13", name: "Daily Gratitude & Reflection Journaling", category: "Evolution", xp: 20 },
-      { id: "m14", name: "Zero Social Media Before Noon", category: "Evolution", xp: 25 },
-      { id: "m15", name: "Cold Exposure / Breathwork Session", category: "Evolution", xp: 25 },
-      { id: "m16", name: "Learn/Practice 1 New Technical Concept", category: "Evolution", xp: 30 },
-      { id: "m17", name: "Daily Task Prioritization & Time Blocking", category: "Evolution", xp: 20 },
-      { id: "m18", name: "Study High-Level Architecture / Manuals", category: "Evolution", xp: 30 },
-      { id: "m19", name: "Review Long-Term Goals & Vision Board", category: "Evolution", xp: 15 },
-      { id: "m20", name: "Evening Screen Detox (1 hr before bed)", category: "Evolution", xp: 25 },
+      { id: "m11", name: "30 Minutes Deep Reading (Self-Mastery/Tech)", category: "Evolution", xp: 30, isMajor: false },
+      { id: "m12", name: "15 Minutes Mindfulness Meditation", category: "Evolution", xp: 20, isMajor: false },
+      { id: "m13", name: "Daily Gratitude & Reflection Journaling", category: "Evolution", xp: 20, isMajor: false },
+      { id: "m14", name: "Zero Social Media Before Noon", category: "Evolution", xp: 25, isMajor: false },
+      { id: "m15", name: "Cold Exposure / Breathwork Session", category: "Evolution", xp: 25, isMajor: false },
+      { id: "m16", name: "Learn/Practice 1 New Technical Concept", category: "Evolution", xp: 30, isMajor: true },
+      { id: "m17", name: "Daily Task Prioritization & Time Blocking", category: "Evolution", xp: 20, isMajor: false },
+      { id: "m18", name: "Study High-Level Architecture / Manuals", category: "Evolution", xp: 30, isMajor: false },
+      { id: "m19", name: "Review Long-Term Goals & Vision Board", category: "Evolution", xp: 15, isMajor: false },
+      { id: "m20", name: "Evening Screen Detox (1 hr before bed)", category: "Evolution", xp: 25, isMajor: false },
 
-      // Work / Career (10)
-      { id: "m21", name: "2 Hours Uninterrupted Deep Work Block", category: "Work", xp: 30 },
-      { id: "m22", name: "Clear Email Inbox to Zero", category: "Work", xp: 20 },
-      { id: "m23", name: "Complete 1 Major Deliverable Milestone", category: "Work", xp: 30 },
-      { id: "m24", name: "Review Technical Code / Calculations", category: "Work", xp: 25 },
-      { id: "m25", name: "Perform Site/System Audit or Optimization", category: "Work", xp: 25 },
-      { id: "m26", name: "Update Professional Registration / CPD Log", category: "Work", xp: 25 },
-      { id: "m27", name: "Organize Workspace & Digital Files", category: "Work", xp: 15 },
-      { id: "m28", name: "Technical Problem Solving / Simulation", category: "Work", xp: 30 },
-      { id: "m29", name: "Review & Submit Pending Proposals", category: "Work", xp: 25 },
-      { id: "m30", name: "End-of-Day Work Retrospective", category: "Work", xp: 15 },
+      { id: "m21", name: "2 Hours Uninterrupted Deep Work Block", category: "Work", xp: 30, isMajor: true },
+      { id: "m22", name: "Clear Email Inbox to Zero", category: "Work", xp: 20, isMajor: false },
+      { id: "m23", name: "Complete 1 Major Deliverable Milestone", category: "Work", xp: 30, isMajor: true },
+      { id: "m24", name: "Review Technical Code / Calculations", category: "Work", xp: 25, isMajor: false },
+      { id: "m25", name: "Perform Site/System Audit or Optimization", category: "Work", xp: 25, isMajor: false },
+      { id: "m26", name: "Update Professional Registration / CPD Log", category: "Work", xp: 25, isMajor: false },
+      { id: "m27", name: "Organize Workspace & Digital Files", category: "Work", xp: 15, isMajor: false },
+      { id: "m28", name: "Technical Problem Solving / Simulation", category: "Work", xp: 30, isMajor: false },
+      { id: "m29", name: "Review & Submit Pending Proposals", category: "Work", xp: 25, isMajor: false },
+      { id: "m30", name: "End-of-Day Work Retrospective", category: "Work", xp: 15, isMajor: false },
 
-      // Finance (10)
-      { id: "m31", name: "Log All Daily Expenses", category: "Finance", xp: 20 },
-      { id: "m32", name: "Zero Impulse Spending Day", category: "Finance", xp: 30 },
-      { id: "m33", name: "Review Monthly Budget & Projections", category: "Finance", xp: 20 },
-      { id: "m34", name: "Pay Bills & Utilities On Time", category: "Finance", xp: 25 },
-      { id: "m35", name: "Deposit Funds to Savings / Investment", category: "Finance", xp: 30 },
-      { id: "m36", name: "Review Bank Statements / Subscriptions", category: "Finance", xp: 20 },
-      { id: "m37", name: "Track Daily Utility Consumption", category: "Finance", xp: 20 },
-      { id: "m38", name: "Research 1 Financial Investment", category: "Finance", xp: 25 },
-      { id: "m39", name: "Plan Meal Budget for the Week", category: "Finance", xp: 20 },
-      { id: "m40", name: "Verify Net Worth & Savings Buffer", category: "Finance", xp: 30 },
+      { id: "m31", name: "Log All Daily Expenses", category: "Finance", xp: 20, isMajor: false },
+      { id: "m32", name: "Zero Impulse Spending Day", category: "Finance", xp: 30, isMajor: false },
+      { id: "m33", name: "Review Monthly Budget & Projections", category: "Finance", xp: 20, isMajor: false },
+      { id: "m34", name: "Pay Bills & Utilities On Time", category: "Finance", xp: 25, isMajor: false },
+      { id: "m35", name: "Deposit Funds to Savings / Investment", category: "Finance", xp: 30, isMajor: true },
+      { id: "m36", name: "Review Bank Statements / Subscriptions", category: "Finance", xp: 20, isMajor: false },
+      { id: "m37", name: "Track Daily Utility Consumption", category: "Finance", xp: 20, isMajor: false },
+      { id: "m38", name: "Research 1 Financial Investment", category: "Finance", xp: 25, isMajor: false },
+      { id: "m39", name: "Plan Meal Budget for the Week", category: "Finance", xp: 20, isMajor: false },
+      { id: "m40", name: "Verify Net Worth & Savings Buffer", category: "Finance", xp: 30, isMajor: false },
 
-      // Socialise (10)
-      { id: "m41", name: "Reach Out to Family / Check In", category: "Socialise", xp: 25 },
-      { id: "m42", name: "Active Listening Conversation", category: "Socialise", xp: 20 },
-      { id: "m43", name: "Express Genuine Appreciation to Someone", category: "Socialise", xp: 15 },
-      { id: "m44", name: "Plan or Attend Quality Social Event", category: "Socialise", xp: 25 },
-      { id: "m45", name: "Professional Networking Outreach", category: "Socialise", xp: 25 },
-      { id: "m46", name: "Offer Assistance / Mentorship to Peer", category: "Socialise", xp: 20 },
-      { id: "m47", name: "Practice Confident Posture & Body Language", category: "Socialise", xp: 15 },
-      { id: "m48", name: "Disconnect from Tech During Meals", category: "Socialise", xp: 20 },
-      { id: "m49", name: "Send Note of Thanks / Encouragement", category: "Socialise", xp: 15 },
-      { id: "m50", name: "Organize & Tidy Shared Living Space", category: "Socialise", xp: 20 }
+      { id: "m41", name: "Reach Out to Family / Check In", category: "Socialise", xp: 25, isMajor: false },
+      { id: "m42", name: "Active Listening Conversation", category: "Socialise", xp: 20, isMajor: false },
+      { id: "m43", name: "Express Genuine Appreciation to Someone", category: "Socialise", xp: 15, isMajor: false },
+      { id: "m44", name: "Plan or Attend Quality Social Event", category: "Socialise", xp: 25, isMajor: false },
+      { id: "m45", name: "Professional Networking Outreach", category: "Socialise", xp: 25, isMajor: false },
+      { id: "m46", name: "Offer Assistance / Mentorship to Peer", category: "Socialise", xp: 20, isMajor: false },
+      { id: "m47", name: "Practice Confident Posture & Body Language", category: "Socialise", xp: 15, isMajor: false },
+      { id: "m48", name: "Disconnect from Tech During Meals", category: "Socialise", xp: 20, isMajor: false },
+      { id: "m49", name: "Send Note of Thanks / Encouragement", category: "Socialise", xp: 15, isMajor: false },
+      { id: "m50", name: "Organize & Tidy Shared Living Space", category: "Socialise", xp: 20, isMajor: false }
     ];
 
     const DEFAULT_REWARDS = [
@@ -868,7 +990,6 @@
       }
     ];
 
-    // Web Audio API Sound Synthesizer
     let audioCtx = null;
     let sfxEnabled = true;
 
@@ -900,9 +1021,9 @@
         osc.stop(now + 0.05);
       } else if (type === 'complete') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, now); // C5
-        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
-        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        osc.frequency.setValueAtTime(783.99, now + 0.16);
         gain.gain.setValueAtTime(0.15, now);
         gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
         osc.start(now);
@@ -915,10 +1036,17 @@
         gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
         osc.start(now);
         osc.stop(now + 0.6);
+      } else if (type === 'timer_end') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1760, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
       }
     }
 
-    // Canvas Particle FX for Level-Up
     const canvas = document.getElementById('fxCanvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -968,11 +1096,16 @@
       if (alive) requestAnimationFrame(animateParticles);
     }
 
-    // State Initialization
     let state = loadInitialState();
     let selectedCategoryFilter = "ALL";
     let searchQuery = "";
     let selectedDayPeriod = "morning";
+
+    // POMODORO TIMER STATE
+    let timerInterval = null;
+    let timerSeconds = 25 * 60;
+    let isTimerRunning = false;
+    let isBreakMode = false;
 
     function loadInitialState() {
       try {
@@ -980,27 +1113,39 @@
         if (saved) {
           return {
             xp: saved.xp || 0,
-            streak: saved.streak || 0,
+            streak: saved.streak || 1,
+            playerName: saved.playerName || "DISCIPLINE SOVEREIGN",
+            titleLocked: !!saved.titleLocked,
+            strictMode: !!saved.strictMode,
             lastActiveDate: saved.lastActiveDate || todayStr(),
             mandatory: saved.mandatory && saved.mandatory.length ? saved.mandatory : DEFAULT_MANDATORY_TASKS,
             daily: saved.daily || [],
             monthly: saved.monthly || [],
             goals: saved.goals && saved.goals.length ? saved.goals : DEFAULT_GOALS,
             rewards: saved.rewards && saved.rewards.length ? saved.rewards : DEFAULT_REWARDS,
-            budget: saved.budget || null
+            budget: saved.budget || null,
+            journal: saved.journal || [],
+            xpLog: saved.xpLog || [],
+            heatmapData: saved.heatmapData || {}
           };
         }
       } catch (e) {}
       return {
         xp: 0,
         streak: 1,
+        playerName: "DISCIPLINE SOVEREIGN",
+        titleLocked: false,
+        strictMode: false,
         lastActiveDate: todayStr(),
         mandatory: DEFAULT_MANDATORY_TASKS,
         daily: [],
         monthly: [],
         goals: DEFAULT_GOALS,
         rewards: DEFAULT_REWARDS,
-        budget: null
+        budget: null,
+        journal: [],
+        xpLog: [],
+        heatmapData: {}
       };
     }
 
@@ -1028,17 +1173,43 @@
       }, 2500);
     }
 
-    // Player Title & Rank Calculator
+    function logXPTransaction(amount, reason) {
+      if (!state.xpLog) state.xpLog = [];
+      state.xpLog.unshift({
+        id: uid(),
+        amount,
+        reason,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: todayStr()
+      });
+      if (state.xpLog.length > 50) state.xpLog.pop();
+    }
+
+    function recordHeatmapActivity() {
+      if (!state.heatmapData) state.heatmapData = {};
+      const date = todayStr();
+      state.heatmapData[date] = (state.heatmapData[date] || 0) + 1;
+    }
+
+    function getStreakMultiplier() {
+      const streak = state.streak || 1;
+      if (streak >= 30) return 1.5;
+      if (streak >= 14) return 1.3;
+      if (streak >= 7) return 1.2;
+      if (streak >= 3) return 1.1;
+      return 1.0;
+    }
+
     function getLevelInfo(xp) {
-      const lvl = Math.floor(xp / 5000) + 1;
+      const lvl = Math.max(1, Math.floor(xp / 5000) + 1);
       let rank = "RANK E";
-      let title = "Shadow Apprentice";
+      let title = "Beast Mode";
       let classTitle = "Monk of Discipline";
 
       if (lvl >= 20) { rank = "RANK SSS"; title = "Absolute Sovereign"; classTitle = "God of Iron Will"; }
       else if (lvl >= 15) { rank = "RANK SS"; title = "Domain Master"; classTitle = "Grandmaster Sovereign"; }
       else if (lvl >= 10) { rank = "RANK S"; title = "Iron Sovereign"; classTitle = "High Executioner"; }
-      else if (lvl >= 7) { rank = "RANK A"; title = "Shadow Hunter"; classTitle = "Discipline Knight"; }
+      else if (lvl >= 7) { rank = "RANK A"; title = "Beast Hunter"; classTitle = "Discipline Knight"; }
       else if (lvl >= 4) { rank = "RANK B"; title = "Vanguard Fighter"; classTitle = "Adept Warrior"; }
       else if (lvl >= 2) { rank = "RANK C"; title = "Awakener"; classTitle = "Iron Operative"; }
 
@@ -1061,7 +1232,69 @@
       document.getElementById("levelModal").classList.add("hidden");
     });
 
-    // Populate Category Dropdowns
+    function handleTitleLockToggle() {
+      if (state.titleLocked) {
+        showToast("Title is PERMANENTLY LOCKED.");
+        return;
+      }
+      const confirmLock = confirm("PERMANENT ACTION: Are you sure you want to lock your title and name? This single-use feature CANNOT be undone!");
+      if (confirmLock) {
+        state.titleLocked = true;
+        saveState();
+        render();
+        showToast("Title & Name Permanently Locked!");
+      }
+    }
+
+    function editPlayerName() {
+      if (state.titleLocked) {
+        showToast("Name editing is locked.");
+        return;
+      }
+      const newName = prompt("Enter your Sovereign Name:", state.playerName);
+      if (newName && newName.trim()) {
+        state.playerName = newName.trim();
+        saveState();
+        render();
+        showToast("Sovereign Name Updated!");
+      }
+    }
+
+    function toggleStrictMode() {
+      state.strictMode = !state.strictMode;
+      saveState();
+      render();
+      showToast(state.strictMode ? "STRICT MODE ENABLED: Missed tasks penalty active!" : "Strict Mode Disabled");
+    }
+
+    function triggerDailyRollover() {
+      const confirmReset = confirm("Initiate Daily Rollover? This will uncheck today's habits and daily quests for a clean fresh start, preserving your XP, Level & Roadmaps.");
+      if (!confirmReset) return;
+
+      if (state.strictMode) {
+        let missedCount = 0;
+        state.mandatory.forEach(t => {
+          if (t.completedOn !== todayStr()) {
+            missedCount++;
+          }
+        });
+        if (missedCount > 0) {
+          const penalty = missedCount * 20;
+          state.xp -= penalty;
+          logXPTransaction(-penalty, `Strict Mode Penalty (${missedCount} missed habits)`);
+          showToast(`Strict Penalty: -${penalty} XP applied!`);
+        }
+      }
+
+      state.mandatory.forEach(t => { t.completedOn = null; });
+      state.daily.forEach(t => { t.completedOn = null; });
+      state.lastActiveDate = todayStr();
+
+      saveState();
+      render();
+      showToast("Daily Rollover Complete. Execute Today's Quests!");
+    }
+
     function setupCategories() {
       const opts = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join("");
       ["mandatoryCategory", "dailyCategory", "monthlyCategory"].forEach(id => {
@@ -1070,40 +1303,46 @@
       });
     }
 
-    // Render Helpers
     function passesFilter(item) {
       const matchesCat = selectedCategoryFilter === "ALL" || item.category === selectedCategoryFilter;
       const matchesSearch = !searchQuery || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) || (item.title && item.title.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesCat && matchesSearch;
     }
 
-    // TASK LIST RENDERER
     function taskItemHTML(task, type) {
       const isMandatory = type === "mandatory";
       const isDaily = type === "daily" || isMandatory;
       const isDone = isDaily ? task.completedOn === todayStr() : !!task.completed;
       const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
-      const subHTML = (type === 'daily' && task.period === 'morning' && subtasks.length) ? `
+      
+      const mult = getStreakMultiplier();
+      const baseXP = task.isMajor ? task.xp * 2 : task.xp;
+      const finalXP = Math.round(baseXP * mult);
+
+      const subHTML = (type === 'daily' && subtasks.length) ? `
         <div class="mt-2 ml-9 p-2 rounded bg-slate-950/80 border border-slate-700">
-          <div class="text-xs text-hud-cyan font-bold mb-1">MORNING SUB-TASKS</div>
-          ${subtasks.map(st => `<label class="flex items-center gap-2 text-xs py-1"><input type="checkbox" ${st.done?'checked':''} onchange="toggleTaskSubtask('${task.id}','${st.id}')"><span class="${st.done?'line-through text-slate-500':'text-slate-300'}">${safeText(st.text)}</span></label>`).join('')}
+          <div class="text-xs text-hud-cyan font-bold mb-1">TASK CHECKLIST</div>
+          ${subtasks.map(st => `<label class="flex items-center gap-2 text-xs py-1"><input type="checkbox" ${st.done?'checked':''} onchange="toggleTaskSubtask('${type}','${task.id}','${st.id}')"><span class="${st.done?'line-through text-slate-500':'text-slate-300'}">${safeText(st.text)}</span></label>`).join('')}
           <div class="text-xs text-slate-500 mt-1">${subtasks.filter(x=>x.done).length}/${subtasks.length} steps complete</div>
         </div>` : '';
+
       return `
-        <li class="p-3 rounded-lg bg-slate-900/80 border ${isDone ? 'border-slate-800 opacity-70' : 'border-slate-700/60'} hover:border-hud-cyan/40 transition-all">
+        <li class="p-3 rounded-lg bg-slate-900/80 border ${isDone ? 'border-slate-800 opacity-70' : (task.isMajor ? 'border-amber-500/80 shadow-[0_0_10px_rgba(255,183,3,0.15)]' : 'border-slate-700/60')} hover:border-hud-cyan/40 transition-all">
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-3 min-w-0 pr-2">
               <button onclick="toggleTask('${type}', '${task.id}')" class="w-6 h-6 rounded flex items-center justify-center border ${isDone ? 'bg-hud-cyan border-hud-cyan text-slate-950' : 'border-slate-600 text-transparent hover:border-hud-cyan'}"><i class="fa-solid fa-check text-xs"></i></button>
               <div class="min-w-0">
-                <div class="text-sm font-medium text-white ${isDone ? 'line-through text-slate-400' : ''}">${safeText(task.name)}
-                  <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono ml-1">${safeText(task.category || '')}</span>
+                <div class="text-sm font-medium text-white flex items-center gap-1.5 flex-wrap ${isDone ? 'line-through text-slate-400' : ''}">
+                  ${task.isMajor ? `<span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 font-orbitron font-extrabold tracking-wider"><i class="fa-solid fa-star"></i> MAJOR</span>` : ''}
+                  <span>${safeText(task.name)}</span>
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">${safeText(task.category || '')}</span>
                   <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-hud-cyan">${task.period === 'afternoon' ? 'Afternoon' : 'Morning'}</span>
                 </div>
                 <div class="text-xs text-slate-400">${isDone ? 'Completed Today' : 'Ready'}${task.dueDate ? ' · Due: '+safeText(task.dueDate) : ''}</div>
               </div>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
-              <span class="text-xs font-orbitron font-bold ${isMandatory ? 'text-hud-crimson' : 'text-hud-cyan'}">+${task.xp} XP</span>
+              <span class="text-xs font-orbitron font-bold ${task.isMajor ? 'text-amber-400' : (isMandatory ? 'text-hud-crimson' : 'text-hud-cyan')}">+${finalXP} XP</span>
               <button onclick="editTask('${type}','${task.id}')" title="Edit task" class="text-hud-cyan hover:text-white text-sm p-1"><i class="fa-solid fa-pen"></i></button>
               <button onclick="deleteTask('${type}', '${task.id}')" title="Delete task" class="text-slate-500 hover:text-hud-crimson text-sm p-1"><i class="fa-solid fa-trash"></i></button>
             </div>
@@ -1111,42 +1350,314 @@
         </li>`;
     }
 
-    // MAIN RENDER FUNCTION
+    function renderTaskChecklists() {
+      const host = document.getElementById('taskChecklistGroups');
+      if (!host) return;
+      const grouping = document.getElementById('taskListGrouping')?.value || 'period';
+      const statusFilter = document.getElementById('taskListStatus')?.value || 'all';
+      
+      const allTasks = [...state.mandatory, ...state.daily, ...state.monthly]
+        .filter(t => Array.isArray(t.subtasks) && t.subtasks.length);
+
+      const tasks = [
+        ...state.mandatory.map(t => ({...t, _type:'mandatory'})),
+        ...state.daily.map(t => ({...t, _type:'daily'})),
+        ...state.monthly.map(t => ({...t, _type:'monthly'}))
+      ].filter(t => Array.isArray(t.subtasks) && t.subtasks.length)
+       .filter(t => !searchQuery || t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          t.subtasks.some(st => st.text.toLowerCase().includes(searchQuery.toLowerCase())))
+       .filter(t => statusFilter === 'all' ||
+          (statusFilter === 'open' && !t.subtasks.every(st => st.done)) ||
+          (statusFilter === 'done' && t.subtasks.every(st => st.done)));
+
+      const total = allTasks.reduce((n,t)=>n+t.subtasks.length,0);
+      const done = allTasks.reduce((n,t)=>n+t.subtasks.filter(x=>x.done).length,0);
+      const summary = document.getElementById('taskChecklistSummary');
+      if (summary) summary.textContent = `${done} of ${total} checklist items complete across ${allTasks.length} task${allTasks.length===1?'':'s'} · ${total ? Math.round(done/total*100) : 0}% overall`;
+
+      if (!tasks.length) {
+        host.innerHTML = '<p class="text-xs text-slate-500 text-center py-8">No checklists match these filters. Add sub-tasks to a daily quest or change the filter.</p>';
+        return;
+      }
+      const keyFor = t => grouping === 'due' ? (t.dueDate || 'No due date') : ((t.period || 'morning') === 'afternoon' ? 'Afternoon' : 'Morning');
+      const groups = {};
+      tasks.forEach(t => { const k=keyFor(t); (groups[k] ||= []).push(t); });
+      const keys = Object.keys(groups).sort((a,b) => grouping === 'due' ?
+        (a===b?0:a==='No due date'?1:b==='No due date'?-1:a.localeCompare(b)) :
+        (a===b?0:a==='Morning'?-1:b==='Morning'?1:0));
+
+      host.innerHTML = keys.map(group => `<div class="rounded-lg border border-slate-700 bg-slate-950/60 p-3">
+        <h3 class="font-orbitron text-sm text-hud-cyan font-bold mb-3">${safeText(group)}</h3>
+        <div class="space-y-3">${groups[group].map(t => {
+          const finished=t.subtasks.filter(x=>x.done).length;
+          const pct=Math.round(finished/t.subtasks.length*100);
+          const allDone=finished===t.subtasks.length;
+          return `<div class="rounded border border-slate-800 bg-slate-900/70 p-3">
+            <div class="flex justify-between items-start gap-2 mb-2"><div><div class="text-sm text-white font-semibold">${safeText(t.name)}</div>
+            <div class="text-xs text-slate-500">${safeText(t._type)} · ${t.dueDate ? 'Due '+safeText(t.dueDate) : 'No due date'} · ${finished}/${t.subtasks.length} done</div></div>
+            <span class="text-xs ${allDone?'text-emerald-400':'text-hud-cyan'}">${pct}%</span></div>
+            <div class="w-full h-1.5 bg-slate-800 rounded mb-2"><div class="h-1.5 ${allDone?'bg-emerald-400':'bg-hud-cyan'} rounded" style="width:${pct}%"></div></div>
+            ${t.subtasks.map(st=>`<label class="flex items-center gap-2 py-1 text-xs ${st.done?'text-slate-500':'text-slate-200'}"><input type="checkbox" ${st.done?'checked':''} onchange="toggleTaskSubtask('${t._type}','${t.id}','${st.id}')"><span class="${st.done?'line-through':''}">${safeText(st.text)}</span></label>`).join('')}
+            ${!allDone ? `<button type="button" onclick="completeRemainingSubtasks('${t._type}','${t.id}')" class="mt-2 text-xs text-hud-cyan hover:text-white underline">Mark remaining complete</button>` : '<div class="mt-2 text-xs text-emerald-400"><i class="fa-solid fa-check-circle mr-1"></i>Checklist complete</div>'}
+          </div>`;
+        }).join('')}</div></div>`).join('');
+    }
+
+    function renderDisciplineHeatmap() {
+      const container = document.getElementById("disciplineHeatmap");
+      if (!container) return;
+
+      const days = [];
+      const today = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        days.push(localDateStr(d));
+      }
+
+      let totalCompletions = 0;
+      container.innerHTML = days.map(dStr => {
+        const count = (state.heatmapData && state.heatmapData[dStr]) || 0;
+        totalCompletions += count;
+        
+        let colorClass = "bg-slate-900 border-slate-800";
+        if (count >= 10) colorClass = "bg-hud-green border-emerald-300 shadow-[0_0_8px_rgba(0,255,170,0.5)]";
+        else if (count >= 5) colorClass = "bg-hud-cyan border-cyan-300 shadow-[0_0_6px_rgba(0,240,255,0.4)]";
+        else if (count >= 2) colorClass = "bg-cyan-700 border-cyan-500";
+        else if (count === 1) colorClass = "bg-cyan-950 border-cyan-800";
+
+        return `<div title="${dStr}: ${count} execution(s)" class="w-full aspect-square rounded-sm border ${colorClass} transition-all duration-200 hover:scale-125"></div>`;
+      }).join('');
+
+      document.getElementById("heatmapSummary").textContent = `${totalCompletions} habit executions logged in past 30 days`;
+    }
+
+    function renderTimerTaskOptions() {
+      const select = document.getElementById("timerTaskSelect");
+      if (!select) return;
+
+      const uncompleted = [...state.mandatory, ...state.daily]
+        .filter(t => t.completedOn !== todayStr());
+
+      select.innerHTML = '<option value="">Select a task to execute during session...</option>' + 
+        uncompleted.map(t => `<option value="${t.id}">${safeText(t.name)} (+${t.xp} XP)</option>`).join('');
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById("timerStartBtn");
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        btn.innerHTML = `<i class="fa-solid fa-play mr-1"></i> RESUME FOCUS`;
+        btn.className = "cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-black px-6 py-2.5 rounded tracking-wider";
+      } else {
+        isTimerRunning = true;
+        btn.innerHTML = `<i class="fa-solid fa-pause mr-1"></i> PAUSE SESSION`;
+        btn.className = "cyber-btn bg-hud-crimson text-white font-orbitron text-xs font-black px-6 py-2.5 rounded tracking-wider";
+        timerInterval = setInterval(() => {
+          if (timerSeconds > 0) {
+            timerSeconds--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            playSound('timer_end');
+            
+            if (!isBreakMode) {
+              showToast("Focus Session Complete! Take a 5-min Rest.");
+              isBreakMode = true;
+              timerSeconds = 5 * 60;
+              document.getElementById("timerModeLabel").textContent = "REST BREAK";
+            } else {
+              showToast("Rest Break Over! Ready to Lock In?");
+              isBreakMode = false;
+              timerSeconds = 25 * 60;
+              document.getElementById("timerModeLabel").textContent = "FOCUS BLOCK";
+            }
+            updateTimerDisplay();
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      isBreakMode = false;
+      timerSeconds = 25 * 60;
+      document.getElementById("timerModeLabel").textContent = "FOCUS BLOCK";
+      document.getElementById("timerStartBtn").innerHTML = `<i class="fa-solid fa-play mr-1"></i> START FOCUS`;
+      document.getElementById("timerStartBtn").className = "cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-black px-6 py-2.5 rounded tracking-wider";
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      document.getElementById("timerDisplay").textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function completeTimerSelectedTask() {
+      const taskId = document.getElementById("timerTaskSelect").value;
+      if (!taskId) {
+        showToast("Select a task first!");
+        return;
+      }
+      const taskInDaily = state.daily.find(t => t.id === taskId);
+      const taskInMandatory = state.mandatory.find(t => t.id === taskId);
+      
+      if (taskInDaily) toggleTask('daily', taskId);
+      else if (taskInMandatory) toggleTask('mandatory', taskId);
+      
+      renderTimerTaskOptions();
+    }
+
+    function renderAuditLog() {
+      const jHost = document.getElementById("journalList");
+      const xHost = document.getElementById("xpHistoryList");
+      if (!jHost || !xHost) return;
+
+      jHost.innerHTML = (state.journal || []).map(j => `
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded">
+          <div class="flex justify-between items-center text-[10px] text-hud-cyan font-mono mb-1">
+            <span>${j.date} · ${j.timestamp}</span>
+            <button onclick="deleteJournalEntry('${j.id}')" class="text-slate-600 hover:text-hud-crimson"><i class="fa-solid fa-trash"></i></button>
+          </div>
+          <p class="text-xs text-slate-200 whitespace-pre-wrap">${safeText(j.text)}</p>
+        </div>
+      `).join('') || '<p class="text-xs text-slate-500">No retrospective entries logged yet.</p>';
+
+      xHost.innerHTML = (state.xpLog || []).map(x => `
+        <div class="flex justify-between items-center bg-slate-950 p-2 rounded border border-slate-900">
+          <div>
+            <span class="text-slate-300 font-semibold block">${safeText(x.reason)}</span>
+            <span class="text-[10px] text-slate-500 font-mono">${x.date} ${x.timestamp}</span>
+          </div>
+          <strong class="${x.amount >= 0 ? 'text-hud-cyan' : 'text-hud-crimson'} font-orbitron">${x.amount >= 0 ? '+' : ''}${x.amount} XP</strong>
+        </div>
+      `).join('') || '<p class="text-xs text-slate-500">No XP transactions logged yet.</p>';
+    }
+
+    function saveJournalEntry() {
+      const text = document.getElementById("journalInput").value.trim();
+      if (!text) return;
+      if (!state.journal) state.journal = [];
+      state.journal.unshift({
+        id: uid(),
+        text,
+        date: todayStr(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      document.getElementById("journalInput").value = "";
+      saveState();
+      render();
+      showToast("Retrospective Logged!");
+    }
+
+    function deleteJournalEntry(id) {
+      state.journal = state.journal.filter(j => j.id !== id);
+      saveState();
+      render();
+    }
+
+    function completeRemainingSubtasks(type, taskId) {
+      const arr = type === 'mandatory' ? state.mandatory : (type === 'monthly' ? state.monthly : state.daily);
+      const task = arr.find(t => t.id === taskId);
+      if (!task || !Array.isArray(task.subtasks)) return;
+      task.subtasks.forEach(st => { st.done = true; });
+      saveState(); render(); showToast('All checklist items completed');
+    }
+
+    function renderDueOverview() {
+      const host = document.getElementById('dueOverview');
+      if (!host) return;
+      const today = todayStr();
+      const tasks = [...state.mandatory, ...state.daily, ...state.monthly].filter(t => t.dueDate);
+      const isComplete = t => !!(t.completedOn && t.completedOn <= t.dueDate);
+      const overdue = tasks.filter(t=>t.dueDate < today && !isComplete(t));
+      const dueToday = tasks.filter(t=>t.dueDate === today && !isComplete(t));
+      const nextWeek = localDateStr(new Date(Date.now()+7*86400000));
+      const upcoming = tasks.filter(t=>t.dueDate > today && t.dueDate <= nextWeek && !isComplete(t));
+      const card = (label,count,detail,color) => `<div class="rounded border border-slate-700 bg-slate-950/70 p-3"><div class="text-xs text-slate-400 uppercase">${label}</div><div class="font-orbitron text-2xl ${color} font-bold">${count}</div><div class="text-xs text-slate-500">${detail}</div></div>`;
+      host.innerHTML = card('Overdue',overdue.length,'Past deadline · penalty applies','text-hud-crimson') +
+        card('Due today',dueToday.length,'Needs completion today','text-hud-gold') +
+        card('Next 7 days',upcoming.length,'Upcoming incomplete tasks','text-hud-cyan');
+    }
+
+    function applyOverduePenalties() {
+      const today = todayStr(); let count = 0;
+      const all = [...state.mandatory, ...state.daily, ...state.monthly];
+      all.forEach(task => {
+        if (!task.dueDate || task.dueDate >= today || task.overduePenaltyApplied) return;
+        const completedByDueDate = !!(task.completedOn && task.completedOn <= task.dueDate);
+        if (!completedByDueDate) {
+          task.overduePenaltyApplied = true;
+          task.overduePenaltyDate = today;
+          state.xp = (Number(state.xp)||0) - 40;
+          logXPTransaction(-40, `Overdue Penalty (${task.name})`);
+          count++;
+        }
+      });
+      if (count) { saveState(); showToast(`-${count*40} XP: ${count} overdue task${count===1?'':'s'}`); }
+      return count;
+    }
+
     function render() {
-      // 1. Player Card & XP
+      applyOverduePenalties();
+
       const info = getLevelInfo(state.xp);
       const level = info.lvl;
-      const currentXPWithin = state.xp % 5000;
-      const xpPct = (currentXPWithin / 5000) * 100;
+      const currentXPWithin = Math.max(0, state.xp % 5000);
+      const xpPct = Math.max(0, Math.min(100, (currentXPWithin / 5000) * 100));
+      const mult = getStreakMultiplier();
 
       document.getElementById("levelDisplay").textContent = level;
       document.getElementById("rankBadge").textContent = info.rank;
       document.getElementById("playerTitle").textContent = info.title;
       document.getElementById("classTitle").textContent = info.classTitle;
-      document.getElementById("xpText").textContent = `${currentXPWithin.toLocaleString()} / 5,000 XP`;
+      document.getElementById("playerNameDisplay").textContent = safeText(state.playerName);
+      document.getElementById("multiplierDisplay").textContent = `${mult.toFixed(1)}x`;
+
+      const strictBtn = document.getElementById("strictModeBtn");
+      if (state.strictMode) {
+        strictBtn.className = "cyber-btn bg-hud-crimson/20 border border-hud-crimson px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-hud-crimson flex items-center gap-1.5";
+        document.getElementById("strictModeLabel").textContent = "STRICT: ON";
+      } else {
+        strictBtn.className = "cyber-btn bg-hud-dark border border-slate-700 px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-slate-400 hover:border-hud-crimson flex items-center gap-1.5";
+        document.getElementById("strictModeLabel").textContent = "STRICT: OFF";
+      }
+
+      const lockBtn = document.getElementById("titleLockButton");
+      if (state.titleLocked) {
+        lockBtn.className = "text-xs font-orbitron font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500 cursor-not-allowed";
+        lockBtn.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> TITLE LOCKED`;
+        document.getElementById("editNameBtn").classList.add("hidden");
+      } else {
+        lockBtn.className = "text-xs font-orbitron font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400 hover:bg-amber-500/30";
+        lockBtn.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> LOCK TITLE (1-USE)`;
+        document.getElementById("editNameBtn").classList.remove("hidden");
+      }
+
+      document.getElementById("xpText").textContent = state.xp < 0 ? `${state.xp.toLocaleString()} XP (DEBT)` : `${currentXPWithin.toLocaleString()} / 5,000 XP`;
       document.getElementById("xpFill").style.width = `${xpPct}%`;
       document.getElementById("totalXpDisplay").textContent = `Total Earned: ${state.xp.toLocaleString()} XP`;
-      document.getElementById("xpToNextDisplay").textContent = `${(5000 - currentXPWithin).toLocaleString()} XP to Level ${level + 1}`;
+      document.getElementById("xpToNextDisplay").textContent = state.xp < 0 ? `${Math.abs(state.xp).toLocaleString()} XP below zero` : `${(5000 - currentXPWithin).toLocaleString()} XP to Level ${level + 1}`;
       document.getElementById("streakDisplay").textContent = `${state.streak || 1} Days`;
 
-      // 2. Stats Counters
       const mandatoryDoneCount = state.mandatory.filter(t => t.completedOn === todayStr()).length;
       document.getElementById("mandatoryStat").textContent = `${mandatoryDoneCount}/${state.mandatory.length}`;
       document.getElementById("dailyStat").textContent = state.daily.filter(t => t.completedOn === todayStr()).length;
       document.getElementById("monthlyStat").textContent = state.monthly.filter(t => t.completed).length;
 
-      // 3. Dashboard Circular Ring & Summaries
       const totalMandatory = state.mandatory.length || 50;
       const mandatoryPct = Math.round((mandatoryDoneCount / totalMandatory) * 100);
       document.getElementById("mandatoryPctText").textContent = `${mandatoryPct}%`;
       document.getElementById("dashMandatoryCount").textContent = `${mandatoryDoneCount}/${totalMandatory}`;
       
-      const circumference = 2 * Math.PI * 50; // 314.15
+      const circumference = 2 * Math.PI * 50;
       const offset = circumference - (mandatoryPct / 100) * circumference;
       document.getElementById("mandatoryRing").style.strokeDashoffset = offset;
 
-      // Strategic Goals Dashboard summary
-      const activeGoals = state.goals.filter(passesFilter);
       document.getElementById("dashGoalCount").textContent = `${state.goals.length} Active`;
       document.getElementById("dashGoalSummary").innerHTML = state.goals.slice(0, 2).map(g => {
         const totalS = g.steps ? g.steps.length : 0;
@@ -1165,7 +1676,6 @@
         `;
       }).join('') || '<p class="text-slate-500">No active goals configured.</p>';
 
-      // Rewards Dashboard Notice
       const sortedRewards = [...state.rewards].sort((a,b) => a.level - b.level);
       const nextReward = sortedRewards.find(r => r.level > level);
       document.getElementById("dashRewardNotice").innerHTML = nextReward ? `
@@ -1175,10 +1685,8 @@
         </div>
       ` : `<p class="text-xs text-slate-400">All set milestone rewards achieved!</p>`;
 
-      // Daily Summary on Dashboard
       document.getElementById("dashDailySummary").innerHTML = state.daily.filter(passesFilter).slice(0, 3).map(t => taskItemHTML(t, 'daily')).join('') || '<p class="text-slate-500">No daily quests added yet.</p>';
 
-      // Budget Summary on Dashboard
       if (state.budget) {
         document.getElementById("dashBudgetSummary").innerHTML = `
           <div class="flex justify-between">
@@ -1188,7 +1696,6 @@
         `;
       }
 
-      // 4. Render Mandatory Tasks Page (Grouped by Category)
       document.getElementById("mandatoryHeaderProgress").textContent = `${mandatoryDoneCount} / ${totalMandatory} (${mandatoryPct}%)`;
       const mandatoryContainer = document.getElementById("mandatoryListContainer");
       mandatoryContainer.innerHTML = CATEGORIES.map(cat => {
@@ -1209,22 +1716,26 @@
         `;
       }).join('') || '<p class="text-xs text-slate-500 p-4 text-center">No mandatory tasks match the criteria.</p>';
 
-      // 5. Render Dailies & Monthlies
       document.getElementById("dailyList").innerHTML = state.daily.filter(t => passesFilter(t) && (selectedDayPeriod === 'all' || (t.period || 'morning') === selectedDayPeriod)).map(t => taskItemHTML(t, 'daily')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No daily quests found.</li>';
       document.getElementById("monthlyList").innerHTML = state.monthly.filter(passesFilter).map(t => taskItemHTML(t, 'monthly')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No monthly goals found.</li>';
-
-      // 6. Strategic Goals Cards
+      
+      renderDisciplineHeatmap();
+      renderTaskChecklists();
       renderStrategicGoals();
+      renderTimerTaskOptions();
+      renderAuditLog();
 
-      // 7. Rewards Grid
       document.getElementById("rewardsGrid").innerHTML = sortedRewards.map(r => {
         const unlocked = level >= r.level;
         return `
           <div class="cyber-panel p-4 flex flex-col justify-between ${unlocked ? 'cyber-panel-gold' : ''}">
             <div>
-              <span class="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded ${unlocked ? 'bg-hud-gold text-slate-950' : 'bg-slate-800 text-slate-400'}">
-                LEVEL ${r.level} REWARD
-              </span>
+              <div class="flex justify-between items-center">
+                <span class="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded ${unlocked ? 'bg-hud-gold text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                  LEVEL ${r.level} REWARD
+                </span>
+                <button onclick="editReward('${r.id}')" class="text-hud-cyan hover:text-white text-xs"><i class="fa-solid fa-pen"></i></button>
+              </div>
               <h4 class="font-orbitron font-bold text-white text-base mt-2">${safeText(r.name)}</h4>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
@@ -1235,14 +1746,10 @@
         `;
       }).join('') || '<p class="text-xs text-slate-500 col-span-3">No level rewards created.</p>';
 
-      // 8. Budget Page Calculations
       renderBudgetPage();
-
-      // 9. Deliverables Overview
       renderDeliverablesOverview();
     }
 
-    // STRATEGIC GOALS CARD RENDERER
     function renderStrategicGoals() {
       const careerHost = document.getElementById("careerGoalsList");
       const personalHost = document.getElementById("personalGoalsList");
@@ -1312,7 +1819,6 @@
       personalHost.innerHTML = personalGoals.map(renderCard).join('') || '<p class="text-xs text-slate-500">No personal goals created.</p>';
     }
 
-    // BUDGET PAGE LOGIC
     function renderBudgetPage() {
       const b = state.budget;
       if (!b) return;
@@ -1335,7 +1841,6 @@
       projEl.className = projected < 0 ? "text-xl font-orbitron text-hud-crimson" : "text-xl font-orbitron text-emerald-400";
     }
 
-    // DELIVERABLES OVERVIEW LOGIC
     function renderDeliverablesOverview() {
       const host = document.getElementById("deliverablesContainer");
       host.innerHTML = CATEGORIES.map(cat => {
@@ -1352,24 +1857,23 @@
             
             ${m.length ? `<h4 class="text-xs font-bold text-hud-crimson uppercase mt-2 mb-1">Mandatory Protocol</h4>
               <ul class="space-y-1 mb-3 text-xs text-slate-300">
-                ${m.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-crimson font-mono">+${t.xp} XP</span></li>`).join('')}
+                ${m.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-crimson font-mono">+${t.isMajor?t.xp*2:t.xp} XP</span></li>`).join('')}
               </ul>` : ''}
 
             ${d.length ? `<h4 class="text-xs font-bold text-hud-cyan uppercase mt-2 mb-1">Daily Quests</h4>
               <ul class="space-y-1 mb-3 text-xs text-slate-300">
-                ${d.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-cyan font-mono">+${t.xp} XP</span></li>`).join('')}
+                ${d.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-cyan font-mono">+${t.isMajor?t.xp*2:t.xp} XP</span></li>`).join('')}
               </ul>` : ''}
 
             ${mo.length ? `<h4 class="text-xs font-bold text-hud-gold uppercase mt-2 mb-1">Monthly Objectives</h4>
               <ul class="space-y-1 text-xs text-slate-300">
-                ${mo.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-gold font-mono">+${t.xp} XP</span></li>`).join('')}
+                ${mo.map(t => `<li class="flex justify-between py-1 border-b border-slate-900"><span>${safeText(t.name)}</span><span class="text-hud-gold font-mono">+${t.isMajor?t.xp*2:t.xp} XP</span></li>`).join('')}
               </ul>` : ''}
           </div>
         `;
       }).join('') || '<p class="text-xs text-slate-500 p-4">No deliverables match filter.</p>';
     }
 
-    // EVENT HANDLERS & ACTIONS
     function toggleTask(type, id) {
       let arr = type === "mandatory" ? state.mandatory : (type === "daily" ? state.daily : state.monthly);
       const task = arr.find(t => t.id === id);
@@ -1377,28 +1881,38 @@
 
       const oldXP = state.xp;
       const isDaily = type === "daily" || type === "mandatory";
+      const mult = getStreakMultiplier();
+      const baseXP = task.isMajor ? task.xp * 2 : task.xp;
+      const finalXP = Math.round(baseXP * mult);
 
       if (isDaily) {
         if (task.completedOn === todayStr()) {
           task.completedOn = null;
-          state.xp = Math.max(0, state.xp - task.xp);
+          state.xp -= finalXP;
+          logXPTransaction(-finalXP, `Uncompleted ${task.name}`);
           showToast("Task marked uncompleted");
         } else {
           task.completedOn = todayStr();
-          state.xp += task.xp;
+          state.xp += finalXP;
+          logXPTransaction(finalXP, `Completed ${task.name}`);
+          recordHeatmapActivity();
           playSound('complete');
-          showToast(`+${task.xp} XP Gained!`);
+          showToast(`+${finalXP} XP Gained! (${mult.toFixed(1)}x boost)`);
           checkLevelUp(oldXP, state.xp);
         }
       } else {
         task.completed = !task.completed;
+        task.completedOn = task.completed ? todayStr() : null;
         if (task.completed) {
-          state.xp += task.xp;
+          state.xp += finalXP;
+          logXPTransaction(finalXP, `Completed ${task.name}`);
+          recordHeatmapActivity();
           playSound('complete');
-          showToast(`+${task.xp} XP Gained!`);
+          showToast(`+${finalXP} XP Gained!`);
           checkLevelUp(oldXP, state.xp);
         } else {
-          state.xp = Math.max(0, state.xp - task.xp);
+          state.xp -= finalXP;
+          logXPTransaction(-finalXP, `Uncompleted ${task.name}`);
           showToast("Task uncompleted");
         }
       }
@@ -1461,13 +1975,27 @@
       render();
     }
 
+    function editReward(id) {
+      const reward = state.rewards.find(r => r.id === id);
+      if (!reward) return;
+      const newLevel = prompt("Edit required level for reward:", String(reward.level));
+      if (newLevel === null) return;
+      const newName = prompt("Edit reward description:", reward.name);
+      if (newName === null) return;
+
+      reward.level = Math.max(2, Number(newLevel) || reward.level);
+      reward.name = newName.trim() || reward.name;
+      saveState();
+      render();
+      showToast("Reward updated!");
+    }
+
     function deleteReward(id) {
       state.rewards = state.rewards.filter(r => r.id !== id);
       saveState();
       render();
     }
 
-    // Task editing and morning checklist controls
     function editTask(type, id) {
       const arr = type === 'mandatory' ? state.mandatory : (type === 'daily' ? state.daily : state.monthly);
       const task = arr.find(t => t.id === id); if (!task) return;
@@ -1476,21 +2004,28 @@
       const period = prompt('Time of day: enter morning or afternoon', task.period || 'morning'); if (period === null) return;
       const category = prompt('Category:', task.category || 'Work'); if (category === null) return;
       const xp = prompt('XP value:', String(task.xp || 10)); if (xp === null) return;
-      task.name = name.trim() || task.name; task.dueDate = dueDate.trim();
+      
+      task.name = name.trim() || task.name;
+      if ((task.dueDate || '') !== dueDate.trim()) { task.overduePenaltyApplied = false; task.overduePenaltyDate = null; }
+      task.dueDate = dueDate.trim();
       task.period = period.toLowerCase() === 'afternoon' ? 'afternoon' : 'morning';
       task.category = category.trim() || task.category; task.xp = Math.max(1, Number(xp) || task.xp || 10);
-      if (type === 'daily' && task.period === 'morning') {
+      
+      if (type === 'daily') {
         const current = (task.subtasks || []).map(x=>x.text).join('\n');
-        const edited = prompt('Morning sub-tasks (one per line):', current);
+        const edited = prompt('Task checklist items (one per line):', current);
         if (edited !== null) task.subtasks = edited.split('\n').map(x=>x.trim()).filter(Boolean).map(text=>({id:uid(),text,done:(task.subtasks||[]).some(old=>old.text===text&&old.done)}));
       }
       saveState(); render(); showToast('Task updated');
     }
-    function toggleTaskSubtask(taskId, subtaskId) {
-      const task = state.daily.find(t=>t.id===taskId); if (!task) return;
+
+    function toggleTaskSubtask(type, taskId, subtaskId) {
+      const arr = type === 'mandatory' ? state.mandatory : (type === 'monthly' ? state.monthly : state.daily);
+      const task = arr.find(t=>t.id===taskId); if (!task) return;
       const sub = (task.subtasks||[]).find(x=>x.id===subtaskId); if (!sub) return;
       sub.done = !sub.done; saveState(); render();
     }
+
     document.querySelectorAll('.period-filter').forEach(btn => btn.addEventListener('click', () => {
       selectedDayPeriod = btn.dataset.period;
       document.querySelectorAll('.period-filter').forEach(b=>b.classList.toggle('bg-hud-cyan', b===btn));
@@ -1503,21 +2038,27 @@
     document.getElementById("addMandatoryBtn").addEventListener("click", () => {
       const name = document.getElementById("mandatoryName").value.trim();
       const category = document.getElementById("mandatoryCategory").value;
-      const xp = Math.min(30, Math.max(1, Number(document.getElementById("mandatoryXP").value) || 25));
+      const xp = Math.min(50, Math.max(1, Number(document.getElementById("mandatoryXP").value) || 25));
+      const isMajor = document.getElementById("mandatoryIsMajor").checked;
+
       if (!name) return;
-      state.mandatory.push({ id: uid(), name, category, xp, dueDate: document.getElementById("mandatoryDue").value, period: document.getElementById("mandatoryPeriod").value });
+      state.mandatory.push({ id: uid(), name, category, xp, isMajor, dueDate: document.getElementById("mandatoryDue").value, period: document.getElementById("mandatoryPeriod").value });
       document.getElementById("mandatoryName").value = "";
+      document.getElementById("mandatoryIsMajor").checked = false;
       saveState(); render(); showToast("Mandatory Habit added!");
     });
 
     document.getElementById("addDailyBtn").addEventListener("click", () => {
       const name = document.getElementById("dailyName").value.trim();
       const category = document.getElementById("dailyCategory").value;
-      const xp = Math.min(20, Math.max(1, Number(document.getElementById("dailyXP").value) || 10));
+      const xp = Math.min(50, Math.max(1, Number(document.getElementById("dailyXP").value) || 10));
+      const isMajor = document.getElementById("dailyIsMajor").checked;
+
       if (!name) return;
-      state.daily.push({ id: uid(), name, category, xp, dueDate: document.getElementById("dailyDue").value, period: document.getElementById("dailyPeriod").value, subtasks: document.getElementById("dailyPeriod").value === 'morning' ? document.getElementById("dailySubtasks").value.split('\n').map(x=>x.trim()).filter(Boolean).map(text=>({id:uid(),text,done:false})) : [] });
+      state.daily.push({ id: uid(), name, category, xp, isMajor, dueDate: document.getElementById("dailyDue").value, period: document.getElementById("dailyPeriod").value, subtasks: document.getElementById("dailySubtasks").value.split('\n').map(x=>x.trim()).filter(Boolean).map(text=>({id:uid(),text,done:false})) });
       document.getElementById("dailyName").value = "";
       document.getElementById("dailySubtasks").value = "";
+      document.getElementById("dailyIsMajor").checked = false;
       saveState(); render(); showToast("Daily Quest added!");
     });
 
@@ -1525,9 +2066,12 @@
       const name = document.getElementById("monthlyName").value.trim();
       const category = document.getElementById("monthlyCategory").value;
       const xp = Number(document.getElementById("monthlyXP").value) || 25;
+      const isMajor = document.getElementById("monthlyIsMajor").checked;
+
       if (!name) return;
-      state.monthly.push({ id: uid(), name, category, xp, completed: false, dueDate: document.getElementById("monthlyDue").value, period: document.getElementById("monthlyPeriod").value });
+      state.monthly.push({ id: uid(), name, category, xp, isMajor, completed: false, dueDate: document.getElementById("monthlyDue").value, period: document.getElementById("monthlyPeriod").value });
       document.getElementById("monthlyName").value = "";
+      document.getElementById("monthlyIsMajor").checked = false;
       saveState(); render(); showToast("Monthly Goal added!");
     });
 
@@ -1561,7 +2105,6 @@
       saveState(); render(); showToast("Budget Data Saved!");
     });
 
-    // SEARCH & FILTER LISTENERS
     document.getElementById("searchInput").addEventListener("input", (e) => {
       searchQuery = e.target.value;
       render();
@@ -1577,7 +2120,6 @@
       });
     });
 
-    // TAB SWITCHING LOGIC
     function switchTab(pageId) {
       playSound('click');
       document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -1596,7 +2138,6 @@
       btn.addEventListener("click", () => switchTab(btn.dataset.page));
     });
 
-    // SOUND TOGGLE
     document.getElementById("soundToggleBtn").addEventListener("click", () => {
       sfxEnabled = !sfxEnabled;
       document.getElementById("soundIcon").className = sfxEnabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
@@ -1604,12 +2145,11 @@
       if (sfxEnabled) playSound('click');
     });
 
-    // BACKUP & RESTORE JSON FILE LOGIC
     document.getElementById("exportBtn").addEventListener("click", () => {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `tatake_isekai_backup_${todayStr()}.json`);
+      downloadAnchor.setAttribute("download", `tatake_sovereign_backup_${todayStr()}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -1627,12 +2167,25 @@
       reader.onload = (event) => {
         try {
           const imported = JSON.parse(event.target.result);
-          if (imported && typeof imported === 'object') {
-            state = imported;
-            saveState();
-            render();
-            showToast("System State Restored!");
-          }
+          const validState = imported && typeof imported === 'object' && !Array.isArray(imported) &&
+            Number.isFinite(Number(imported.xp)) &&
+            ['mandatory','daily','monthly','goals','rewards'].every(k => Array.isArray(imported[k]) && imported[k].every(item => item && typeof item === 'object' && !Array.isArray(item)));
+          if (!validState) throw new Error('Backup structure is not a valid TATAKE state');
+          imported.xp = Number(imported.xp);
+          imported.streak = Number(imported.streak) || 1;
+          imported.playerName = imported.playerName || "DISCIPLINE SOVEREIGN";
+          imported.titleLocked = !!imported.titleLocked;
+          imported.strictMode = !!imported.strictMode;
+          imported.journal = imported.journal || [];
+          imported.xpLog = imported.xpLog || [];
+          imported.heatmapData = imported.heatmapData || {};
+          imported.mandatory = imported.mandatory.map(t => ({...t, subtasks:Array.isArray(t.subtasks)?t.subtasks:[]}));
+          imported.daily = imported.daily.map(t => ({...t, subtasks:Array.isArray(t.subtasks)?t.subtasks:[]}));
+          imported.monthly = imported.monthly.map(t => ({...t, subtasks:Array.isArray(t.subtasks)?t.subtasks:[]}));
+          state = imported;
+          saveState();
+          render();
+          showToast("System State Restored!");
         } catch (err) {
           alert("Invalid backup JSON file.");
         }
@@ -1640,18 +2193,15 @@
       reader.readAsText(file);
     });
 
-    // INITIALIZATION & CLOUD BRIDGE STARTUP
     setupCategories();
 
-    // Init Firebase Bridge for multi-device cross-PC sync
     if (window.FirebaseBridge) {
       window.FirebaseBridge.init(
         (remoteState) => {
-          // Cloud update received
           state = remoteState;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
           render();
-          showToast("Cloud State Synced Across Devices!");
+          showToast("Cloud State Synced!");
         },
         (status) => {
           const badge = document.getElementById("cloudStatusBadge");
@@ -1669,6 +2219,10 @@
       );
     }
 
+    document.getElementById('taskListGrouping')?.addEventListener('change', renderTaskChecklists);
+    document.getElementById('taskListStatus')?.addEventListener('change', renderTaskChecklists);
+
+    setInterval(() => { if (applyOverduePenalties()) render(); }, 60000);
     render();
   </script>
 </body>
