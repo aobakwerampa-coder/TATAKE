@@ -160,6 +160,15 @@
       pointer-events: none;
       z-index: 9999;
     }
+    /* Accessibility: increase all Tailwind text scale sizes by approximately 2px */
+    .text-xs { font-size: calc(0.75rem + 2px) !important; }
+    .text-sm { font-size: calc(0.875rem + 2px) !important; }
+    .text-base { font-size: calc(1rem + 2px) !important; }
+    .text-lg { font-size: calc(1.125rem + 2px) !important; }
+    .text-xl { font-size: calc(1.25rem + 2px) !important; }
+    .text-2xl { font-size: calc(1.5rem + 2px) !important; }
+    [class*="text-[10px]"] { font-size: 12px !important; }
+    [class*="text-[11px]"] { font-size: 13px !important; }
   </style>
 
   <!-- Firebase Scripts (Modular ES Modules approach for Cloud Sync) -->
@@ -499,6 +508,8 @@
             <input id="mandatoryName" type="text" placeholder="e.g. Cold Plunge 3 Minutes" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
             <select id="mandatoryCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
             <input id="mandatoryXP" type="number" min="1" max="30" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <input id="mandatoryDue" type="date" title="Due date" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
+            <select id="mandatoryPeriod" title="Task period" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"><option value="morning">Morning</option><option value="afternoon">Afternoon</option></select>
             <button id="addMandatoryBtn" class="sm:col-span-2 cyber-btn bg-hud-crimson text-white font-orbitron text-xs font-bold py-2 rounded">
               + ADD
             </button>
@@ -529,12 +540,20 @@
             <input id="dailyName" type="text" placeholder="e.g. 30-min Cardio Session" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
             <select id="dailyCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
             <input id="dailyXP" type="number" min="1" max="20" value="10" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <input id="dailyDue" type="date" title="Due date" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
+            <select id="dailyPeriod" title="Task period" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"><option value="morning">Morning</option><option value="afternoon">Afternoon</option></select>
+            <textarea id="dailySubtasks" placeholder="Morning task checklist (one sub-task per line; optional)" rows="2" class="sm:col-span-10 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"></textarea>
             <button id="addDailyBtn" class="sm:col-span-2 cyber-btn bg-hud-cyan text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
               + ADD QUEST
             </button>
           </div>
         </div>
 
+        <div class="flex gap-2 mb-3" id="dayPeriodTabs">
+          <button type="button" data-period="morning" class="period-filter cyber-btn bg-hud-cyan text-slate-950 px-4 py-2 rounded text-xs font-bold">Morning</button>
+          <button type="button" data-period="afternoon" class="period-filter cyber-btn bg-slate-800 text-slate-200 px-4 py-2 rounded text-xs font-bold">Afternoon</button>
+          <button type="button" data-period="all" class="period-filter cyber-btn bg-slate-800 text-slate-200 px-4 py-2 rounded text-xs font-bold">All Tasks</button>
+        </div>
         <ul id="dailyList" class="space-y-2">
           <!-- Rendered via JS -->
         </ul>
@@ -555,6 +574,8 @@
             <input id="monthlyName" type="text" placeholder="e.g. Finish Reading 2 Technical Books" class="sm:col-span-5 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
             <select id="monthlyCategory" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan"></select>
             <input id="monthlyXP" type="number" min="1" max="50" value="25" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-hud-cyan">
+            <input id="monthlyDue" type="date" title="Due date" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white">
+            <select id="monthlyPeriod" title="Task period" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white"><option value="morning">Morning</option><option value="afternoon">Afternoon</option></select>
             <button id="addMonthlyBtn" class="sm:col-span-2 cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-bold py-2 rounded">
               + ADD GOAL
             </button>
@@ -951,6 +972,7 @@
     let state = loadInitialState();
     let selectedCategoryFilter = "ALL";
     let searchQuery = "";
+    let selectedDayPeriod = "morning";
 
     function loadInitialState() {
       try {
@@ -1060,31 +1082,33 @@
       const isMandatory = type === "mandatory";
       const isDaily = type === "daily" || isMandatory;
       const isDone = isDaily ? task.completedOn === todayStr() : !!task.completed;
-
+      const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+      const subHTML = (type === 'daily' && task.period === 'morning' && subtasks.length) ? `
+        <div class="mt-2 ml-9 p-2 rounded bg-slate-950/80 border border-slate-700">
+          <div class="text-xs text-hud-cyan font-bold mb-1">MORNING SUB-TASKS</div>
+          ${subtasks.map(st => `<label class="flex items-center gap-2 text-xs py-1"><input type="checkbox" ${st.done?'checked':''} onchange="toggleTaskSubtask('${task.id}','${st.id}')"><span class="${st.done?'line-through text-slate-500':'text-slate-300'}">${safeText(st.text)}</span></label>`).join('')}
+          <div class="text-xs text-slate-500 mt-1">${subtasks.filter(x=>x.done).length}/${subtasks.length} steps complete</div>
+        </div>` : '';
       return `
-        <li class="flex items-center justify-between p-3 rounded-lg bg-slate-900/80 border ${isDone ? 'border-slate-800 opacity-60' : 'border-slate-700/60'} hover:border-hud-cyan/40 transition-all">
-          <div class="flex items-center gap-3 min-w-0 pr-2">
-            <button onclick="toggleTask('${type}', '${task.id}')" class="w-6 h-6 rounded flex items-center justify-center border ${isDone ? 'bg-hud-cyan border-hud-cyan text-slate-950' : 'border-slate-600 text-transparent hover:border-hud-cyan'}">
-              <i class="fa-solid fa-check text-xs"></i>
-            </button>
-            <div class="min-w-0">
-              <div class="text-xs font-medium text-white truncate ${isDone ? 'line-through text-slate-400' : ''}">
-                ${safeText(task.name)} 
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono ml-1">${task.category}</span>
-              </div>
-              <div class="text-[10px] text-slate-500 font-rajdhani">
-                ${isDone ? 'Completed Today' : 'Ready'}
+        <li class="p-3 rounded-lg bg-slate-900/80 border ${isDone ? 'border-slate-800 opacity-70' : 'border-slate-700/60'} hover:border-hud-cyan/40 transition-all">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-3 min-w-0 pr-2">
+              <button onclick="toggleTask('${type}', '${task.id}')" class="w-6 h-6 rounded flex items-center justify-center border ${isDone ? 'bg-hud-cyan border-hud-cyan text-slate-950' : 'border-slate-600 text-transparent hover:border-hud-cyan'}"><i class="fa-solid fa-check text-xs"></i></button>
+              <div class="min-w-0">
+                <div class="text-sm font-medium text-white ${isDone ? 'line-through text-slate-400' : ''}">${safeText(task.name)}
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono ml-1">${safeText(task.category || '')}</span>
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-hud-cyan">${task.period === 'afternoon' ? 'Afternoon' : 'Morning'}</span>
+                </div>
+                <div class="text-xs text-slate-400">${isDone ? 'Completed Today' : 'Ready'}${task.dueDate ? ' · Due: '+safeText(task.dueDate) : ''}</div>
               </div>
             </div>
-          </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-xs font-orbitron font-bold ${isMandatory ? 'text-hud-crimson' : 'text-hud-cyan'}">+${task.xp} XP</span>
-            <button onclick="deleteTask('${type}', '${task.id}')" class="text-slate-600 hover:text-hud-crimson text-xs p-1">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        </li>
-      `;
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="text-xs font-orbitron font-bold ${isMandatory ? 'text-hud-crimson' : 'text-hud-cyan'}">+${task.xp} XP</span>
+              <button onclick="editTask('${type}','${task.id}')" title="Edit task" class="text-hud-cyan hover:text-white text-sm p-1"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="deleteTask('${type}', '${task.id}')" title="Delete task" class="text-slate-500 hover:text-hud-crimson text-sm p-1"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>${subHTML}
+        </li>`;
     }
 
     // MAIN RENDER FUNCTION
@@ -1186,7 +1210,7 @@
       }).join('') || '<p class="text-xs text-slate-500 p-4 text-center">No mandatory tasks match the criteria.</p>';
 
       // 5. Render Dailies & Monthlies
-      document.getElementById("dailyList").innerHTML = state.daily.filter(passesFilter).map(t => taskItemHTML(t, 'daily')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No daily quests found.</li>';
+      document.getElementById("dailyList").innerHTML = state.daily.filter(t => passesFilter(t) && (selectedDayPeriod === 'all' || (t.period || 'morning') === selectedDayPeriod)).map(t => taskItemHTML(t, 'daily')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No daily quests found.</li>';
       document.getElementById("monthlyList").innerHTML = state.monthly.filter(passesFilter).map(t => taskItemHTML(t, 'monthly')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No monthly goals found.</li>';
 
       // 6. Strategic Goals Cards
@@ -1443,13 +1467,45 @@
       render();
     }
 
+    // Task editing and morning checklist controls
+    function editTask(type, id) {
+      const arr = type === 'mandatory' ? state.mandatory : (type === 'daily' ? state.daily : state.monthly);
+      const task = arr.find(t => t.id === id); if (!task) return;
+      const name = prompt('Edit task name:', task.name); if (name === null) return;
+      const dueDate = prompt('Due date (YYYY-MM-DD; leave blank for none):', task.dueDate || ''); if (dueDate === null) return;
+      const period = prompt('Time of day: enter morning or afternoon', task.period || 'morning'); if (period === null) return;
+      const category = prompt('Category:', task.category || 'Work'); if (category === null) return;
+      const xp = prompt('XP value:', String(task.xp || 10)); if (xp === null) return;
+      task.name = name.trim() || task.name; task.dueDate = dueDate.trim();
+      task.period = period.toLowerCase() === 'afternoon' ? 'afternoon' : 'morning';
+      task.category = category.trim() || task.category; task.xp = Math.max(1, Number(xp) || task.xp || 10);
+      if (type === 'daily' && task.period === 'morning') {
+        const current = (task.subtasks || []).map(x=>x.text).join('\n');
+        const edited = prompt('Morning sub-tasks (one per line):', current);
+        if (edited !== null) task.subtasks = edited.split('\n').map(x=>x.trim()).filter(Boolean).map(text=>({id:uid(),text,done:(task.subtasks||[]).some(old=>old.text===text&&old.done)}));
+      }
+      saveState(); render(); showToast('Task updated');
+    }
+    function toggleTaskSubtask(taskId, subtaskId) {
+      const task = state.daily.find(t=>t.id===taskId); if (!task) return;
+      const sub = (task.subtasks||[]).find(x=>x.id===subtaskId); if (!sub) return;
+      sub.done = !sub.done; saveState(); render();
+    }
+    document.querySelectorAll('.period-filter').forEach(btn => btn.addEventListener('click', () => {
+      selectedDayPeriod = btn.dataset.period;
+      document.querySelectorAll('.period-filter').forEach(b=>b.classList.toggle('bg-hud-cyan', b===btn));
+      document.querySelectorAll('.period-filter').forEach(b=>b.classList.toggle('text-slate-950', b===btn));
+      document.querySelectorAll('.period-filter').forEach(b=>b.classList.toggle('bg-slate-800', b!==btn));
+      render();
+    }));
+
     // FORM SUBMISSIONS
     document.getElementById("addMandatoryBtn").addEventListener("click", () => {
       const name = document.getElementById("mandatoryName").value.trim();
       const category = document.getElementById("mandatoryCategory").value;
       const xp = Math.min(30, Math.max(1, Number(document.getElementById("mandatoryXP").value) || 25));
       if (!name) return;
-      state.mandatory.push({ id: uid(), name, category, xp });
+      state.mandatory.push({ id: uid(), name, category, xp, dueDate: document.getElementById("mandatoryDue").value, period: document.getElementById("mandatoryPeriod").value });
       document.getElementById("mandatoryName").value = "";
       saveState(); render(); showToast("Mandatory Habit added!");
     });
@@ -1459,8 +1515,9 @@
       const category = document.getElementById("dailyCategory").value;
       const xp = Math.min(20, Math.max(1, Number(document.getElementById("dailyXP").value) || 10));
       if (!name) return;
-      state.daily.push({ id: uid(), name, category, xp });
+      state.daily.push({ id: uid(), name, category, xp, dueDate: document.getElementById("dailyDue").value, period: document.getElementById("dailyPeriod").value, subtasks: document.getElementById("dailyPeriod").value === 'morning' ? document.getElementById("dailySubtasks").value.split('\n').map(x=>x.trim()).filter(Boolean).map(text=>({id:uid(),text,done:false})) : [] });
       document.getElementById("dailyName").value = "";
+      document.getElementById("dailySubtasks").value = "";
       saveState(); render(); showToast("Daily Quest added!");
     });
 
@@ -1469,7 +1526,7 @@
       const category = document.getElementById("monthlyCategory").value;
       const xp = Number(document.getElementById("monthlyXP").value) || 25;
       if (!name) return;
-      state.monthly.push({ id: uid(), name, category, xp, completed: false });
+      state.monthly.push({ id: uid(), name, category, xp, completed: false, dueDate: document.getElementById("monthlyDue").value, period: document.getElementById("monthlyPeriod").value });
       document.getElementById("monthlyName").value = "";
       saveState(); render(); showToast("Monthly Goal added!");
     });
