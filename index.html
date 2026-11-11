@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TATAKE - System UI Overlay V9.0 Sovereign Edition</title>
+  <title>TATAKE - System UI Overlay V10.0 Sovereign Edition</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
@@ -88,6 +88,11 @@
       box-shadow: 0 0 20px rgba(255, 183, 3, 0.1), inset 0 0 15px rgba(255, 183, 3, 0.04);
     }
 
+    .cyber-panel-emerald {
+      border-color: rgba(0, 255, 170, 0.4);
+      box-shadow: 0 0 20px rgba(0, 255, 170, 0.1), inset 0 0 15px rgba(0, 255, 170, 0.04);
+    }
+
     .cyber-btn {
       position: relative;
       clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
@@ -119,14 +124,16 @@
       z-index: 9999;
     }
 
-    .text-xs { font-size: calc(0.75rem + 2px) !important; }
-    .text-sm { font-size: calc(0.875rem + 2px) !important; }
-    .text-base { font-size: calc(1rem + 2px) !important; }
-    .text-lg { font-size: calc(1.125rem + 2px) !important; }
-    .text-xl { font-size: calc(1.25rem + 2px) !important; }
-    .text-2xl { font-size: calc(1.5rem + 2px) !important; }
-    [class*="text-[10px]"] { font-size: 12px !important; }
-    [class*="text-[11px]"] { font-size: 13px !important; }
+    /* Popup Splash Animation */
+    @keyframes splashPop {
+      0% { opacity: 0; transform: scale(0.85) translateY(20px); }
+      15% { opacity: 1; transform: scale(1) translateY(0); }
+      85% { opacity: 1; transform: scale(1) translateY(0); }
+      100% { opacity: 0; transform: scale(0.95) translateY(-20px); }
+    }
+    .animate-splash {
+      animation: splashPop 2.2s ease-in-out forwards;
+    }
   </style>
 
   <!-- Firebase Scripts -->
@@ -199,6 +206,20 @@
   <canvas id="fxCanvas"></canvas>
   <div class="scanline fixed inset-0 z-50"></div>
 
+  <!-- 2-SECOND MOTIVATIONAL MOTD OVERLAY -->
+  <div id="motdOverlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-lg z-50 flex items-center justify-center p-4">
+    <div class="cyber-panel cyber-panel-gold max-w-lg w-full p-8 text-center animate-splash shadow-[0_0_50px_rgba(255,183,3,0.3)]">
+      <div class="w-14 h-14 bg-hud-gold/20 text-hud-gold rounded-full border border-hud-gold flex items-center justify-center text-2xl mx-auto mb-3 shadow-[0_0_20px_rgba(255,183,3,0.5)]">
+        <i class="fa-solid fa-quote-left"></i>
+      </div>
+      <h3 class="font-orbitron font-extrabold text-xs text-hud-gold tracking-widest uppercase mb-1">WEEKLY FOCUS & MOTIVATION</h3>
+      <p id="motdQuoteText" class="font-orbitron font-bold text-xl sm:text-2xl text-white my-4 italic drop-shadow-md">"I am building an unshakeable mind and body."</p>
+      <div class="inline-block text-[10px] font-mono text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1 rounded-full">
+        TATAKE SOVEREIGN DISCIPLINE PROTOCOL
+      </div>
+    </div>
+  </div>
+
   <!-- MAIN HUD CONTAINER -->
   <div class="max-w-7xl mx-auto px-3 sm:px-6 py-4 relative z-10">
 
@@ -210,24 +231,29 @@
         </div>
         <div>
           <h1 class="font-orbitron text-2xl sm:text-3xl font-black tracking-widest text-white flex items-center gap-2">
-            TATAKE <span class="text-xs px-2 py-0.5 rounded bg-hud-cyan text-slate-950 font-rajdhani font-bold">SOVEREIGN V9.0</span>
+            TATAKE <span class="text-xs px-2 py-0.5 rounded bg-hud-cyan text-slate-950 font-rajdhani font-bold">SOVEREIGN V10.0</span>
           </h1>
-          <p class="text-xs text-hud-cyan/80 font-rajdhani tracking-wider uppercase">Iron Discipline Protocol & Sovereign HUD</p>
+          <p class="text-xs text-hud-cyan/80 font-rajdhani tracking-wider uppercase">Iron Discipline, Strike Accountability & Sober Streak System</p>
         </div>
       </div>
 
-      <!-- SYSTEM CONTROLS, STRICT MODE & CLOUD STATUS -->
+      <!-- SYSTEM CONTROLS, STRIKES & CLOUD STATUS -->
       <div class="flex items-center gap-2.5 flex-wrap justify-center">
+        <!-- Strikes Accountability Counter -->
+        <div id="strikesWidget" class="bg-slate-900/90 border border-hud-crimson/80 px-3 py-1.5 rounded flex items-center gap-2 shadow-[0_0_10px_rgba(230,57,70,0.2)]">
+          <i class="fa-solid fa-skull text-hud-crimson text-sm animate-pulse"></i>
+          <span class="text-xs font-orbitron font-bold text-slate-300">STRIKES:</span>
+          <div id="strikeIcons" class="flex items-center gap-1">
+            <span class="w-3 h-3 rounded-full border border-hud-crimson bg-slate-950"></span>
+            <span class="w-3 h-3 rounded-full border border-hud-crimson bg-slate-950"></span>
+            <span class="w-3 h-3 rounded-full border border-hud-crimson bg-slate-950"></span>
+          </div>
+        </div>
+
         <!-- Daily Rollover Trigger -->
         <button id="dailyRolloverBtn" onclick="triggerDailyRollover()" class="cyber-btn bg-hud-dark border border-amber-400/50 px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-amber-300 hover:bg-amber-400/20 flex items-center gap-1.5" title="Reset daily completions for the new day">
           <i class="fa-solid fa-rotate text-amber-400"></i>
           <span>DAILY ROLLOVER</span>
-        </button>
-
-        <!-- Strict Mode Toggle -->
-        <button id="strictModeBtn" onclick="toggleStrictMode()" class="cyber-btn bg-hud-dark border border-slate-700 px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-slate-400 hover:border-hud-crimson flex items-center gap-1.5">
-          <i class="fa-solid fa-skull" id="strictModeIcon"></i>
-          <span id="strictModeLabel">STRICT: OFF</span>
         </button>
 
         <!-- Sound Toggle -->
@@ -276,7 +302,7 @@
                 <span class="text-[10px] px-1.5 py-0.2 bg-hud-cyan/20 text-hud-cyan rounded border border-hud-cyan/40 font-mono">Aobie #01</span>
               </div>
               <button id="titleLockButton" onclick="handleTitleLockToggle()" class="text-xs font-orbitron font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400 hover:bg-amber-500/30">
-                <i class="fa-solid fa-lock-open mr-1"></i> LOCK TITLE (1-USE)
+                <i class="fa-solid fa-lock-open mr-1"></i> LOCK TITLE
               </button>
             </div>
 
@@ -288,8 +314,8 @@
 
             <div class="flex items-center gap-3 text-xs text-slate-400 font-rajdhani mt-1">
               <span><i class="fa-solid fa-fire text-hud-crimson mr-1"></i>Streak: <strong id="streakDisplay" class="text-white">1 Day</strong></span>
+              <span><i class="fa-solid fa-wine-glass-slashed text-emerald-400 mr-1"></i>Sober: <strong id="soberDisplay" class="text-emerald-400">0 Days</strong></span>
               <span><i class="fa-solid fa-bolt text-hud-gold mr-1"></i>Multiplier: <strong id="multiplierDisplay" class="text-hud-gold">1.0x</strong></span>
-              <span><i class="fa-solid fa-shield-halved text-hud-cyan mr-1"></i>Class: <strong id="classTitle" class="text-hud-cyan">Monk of Iron</strong></span>
             </div>
           </div>
         </div>
@@ -322,8 +348,8 @@
             <strong id="dailyStat" class="text-base font-orbitron text-hud-cyan">0</strong>
           </div>
           <div class="bg-slate-900/80 border border-slate-700/60 p-2 rounded">
-            <span class="block text-xs font-rajdhani text-slate-400">Monthly</span>
-            <strong id="monthlyStat" class="text-base font-orbitron text-hud-gold">0</strong>
+            <span class="block text-xs font-rajdhani text-slate-400">Sober Days</span>
+            <strong id="soberStat" class="text-base font-orbitron text-emerald-400">0</strong>
           </div>
         </div>
 
@@ -334,6 +360,9 @@
     <nav class="flex items-center gap-2 overflow-x-auto pb-2 mb-6 no-scrollbar">
       <button class="tab-btn cyber-btn active bg-hud-cyan text-slate-950 font-orbitron text-xs font-extrabold px-4 py-2.5 rounded whitespace-nowrap" data-page="dashboard">
         <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
+      </button>
+      <button class="tab-btn cyber-btn bg-hud-dark border border-emerald-500/60 text-emerald-400 hover:bg-emerald-500/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="sober">
+        <i class="fa-solid fa-shield-heart mr-1.5"></i> 🛡️ Sober Streak
       </button>
       <button class="tab-btn cyber-btn bg-hud-dark border border-hud-crimson/50 text-hud-crimson hover:bg-hud-crimson/20 font-orbitron text-xs font-bold px-4 py-2.5 rounded whitespace-nowrap" data-page="mandatory">
         <i class="fa-solid fa-bolt mr-1.5"></i> ⚡ Mandatory (50)
@@ -389,6 +418,23 @@
     <!-- PAGE 1: DASHBOARD -->
     <section id="page-dashboard" class="page-content space-y-6">
       
+      <!-- SOBER STREAK MINI BANNER -->
+      <div class="cyber-panel cyber-panel-emerald p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400 text-2xl shadow-[0_0_15px_rgba(0,255,170,0.3)]">
+            <i class="fa-solid fa-shield-heart"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-orbitron font-bold text-emerald-400 uppercase tracking-widest">SOBER JOURNEY TRACKER</span>
+            <h3 class="text-lg font-orbitron font-black text-white">Sober Streak: <span id="dashSoberDays" class="text-emerald-400">0 Days</span></h3>
+            <p class="text-xs text-slate-400 font-rajdhani">Earn <strong class="text-emerald-300">+35 XP</strong> for every consistent week sober!</p>
+          </div>
+        </div>
+        <button onclick="switchTab('sober')" class="cyber-btn bg-emerald-500 text-slate-950 font-orbitron text-xs font-bold px-4 py-2 rounded">
+          VIEW SOBER TAB →
+        </button>
+      </div>
+
       <!-- DISCIPLINE HEATMAP (PAST 30 DAYS) -->
       <div class="cyber-panel p-5">
         <div class="flex items-center justify-between mb-3 border-b border-slate-700/60 pb-2">
@@ -411,9 +457,9 @@
 
       <div class="cyber-panel cyber-panel-red p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-          <div><h3 class="font-orbitron font-bold text-white text-base"><i class="fa-solid fa-calendar-day text-hud-crimson mr-2"></i>MISSION CONTROL</h3>
-          <p class="text-xs text-slate-400">Deadlines and incomplete tasks that need attention.</p></div>
-          <button type="button" onclick="switchTab('deliverables')" class="cyber-btn bg-slate-800 border border-slate-600 px-3 py-2 rounded text-xs text-hud-cyan">VIEW TASKS</button>
+          <div><h3 class="font-orbitron font-bold text-white text-base"><i class="fa-solid fa-calendar-day text-hud-crimson mr-2"></i>MISSION CONTROL & TIME DEADLINES</h3>
+          <p class="text-xs text-slate-400">Tasks not updated before end of next day suffer -10 XP penalty & strikes.</p></div>
+          <button type="button" onclick="switchTab('deliverables')" class="cyber-btn bg-slate-800 border border-slate-600 px-3 py-2 rounded text-xs text-hud-cyan">VIEW ALL DELIVERABLES</button>
         </div>
         <div id="dueOverview" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
       </div>
@@ -494,6 +540,89 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- PAGE 1.5: SOBER STREAK TAB -->
+    <section id="page-sober" class="page-content hidden space-y-6">
+      <div class="cyber-panel cyber-panel-emerald p-6">
+        <div class="mb-4 border-b border-emerald-500/30 pb-3 flex justify-between items-center flex-wrap gap-2">
+          <div>
+            <h2 class="font-orbitron font-extrabold text-xl text-white flex items-center gap-2">
+              <i class="fa-solid fa-shield-heart text-emerald-400"></i> SOBER STREAK & MIND MASTERY
+            </h2>
+            <p class="text-xs text-slate-400">Track your sobriety journey. Earn +35 XP for every completed week!</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="recordSoberDay()" class="cyber-btn bg-emerald-500 text-slate-950 font-orbitron text-xs font-bold px-4 py-2 rounded">
+              <i class="fa-solid fa-check mr-1"></i> LOG TODAY SOBER
+            </button>
+            <button onclick="resetSoberStreak()" class="cyber-btn bg-slate-800 border border-hud-crimson text-hud-crimson font-orbitron text-xs font-bold px-3 py-2 rounded hover:bg-hud-crimson/20">
+              RESET STREAK
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
+          <!-- Big Days Counter -->
+          <div class="bg-slate-900/90 border-2 border-emerald-400 p-6 rounded-xl text-center flex flex-col justify-center items-center shadow-[0_0_25px_rgba(0,255,170,0.15)]">
+            <span class="text-xs font-orbitron font-bold text-emerald-400 uppercase tracking-widest mb-1">CONSECUTIVE SOBER DAYS</span>
+            <div id="soberDaysCount" class="font-orbitron text-6xl font-black text-white my-2">0</div>
+            <span class="text-xs text-slate-400 font-mono" id="soberWeeksCount">0 Weeks Completed (+0 XP)</span>
+          </div>
+
+          <!-- Weekly Motivation Banner & Input -->
+          <div class="md:col-span-2 bg-slate-900/90 border border-slate-700/80 p-5 rounded-xl flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <h4 class="text-xs font-orbitron text-hud-gold uppercase font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-quote-left text-hud-gold"></i> ACTIVE WEEKLY MOTIVATION
+                </h4>
+                <span class="text-[10px] font-mono text-slate-400" id="quoteUpdateDeadline">Must update weekly (-35 XP penalty)</span>
+              </div>
+              <p id="activeQuoteDisplay" class="text-base font-orbitron text-white italic bg-slate-950 p-3 rounded border border-slate-800 mb-3">
+                "I am building an unshakeable mind and body."
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-xs text-slate-400 font-rajdhani">Update Weekly Motivation Statement:</label>
+              <div class="flex gap-2">
+                <input id="weeklyQuoteInput" type="text" placeholder="Type your weekly reason for staying sober..." class="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400">
+                <button onclick="saveWeeklyQuote()" class="cyber-btn bg-hud-gold text-slate-950 font-orbitron text-xs font-bold px-4 py-2 rounded whitespace-nowrap">
+                  SAVE & REFRESH
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benefits & Milestone Progress -->
+        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+          <h3 class="font-orbitron font-bold text-xs text-emerald-400 mb-3 uppercase">SOBRIETY MILESTONE REWARDS</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+              <span class="text-slate-400 block font-mono">1 WEEK (7 DAYS)</span>
+              <strong class="text-white block font-orbitron my-1">+35 XP REWARD</strong>
+              <span class="text-[10px] text-emerald-400">Clarity & Energy</span>
+            </div>
+            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+              <span class="text-slate-400 block font-mono">2 WEEKS (14 DAYS)</span>
+              <strong class="text-white block font-orbitron my-1">+70 XP CUMULATIVE</strong>
+              <span class="text-[10px] text-emerald-400">Dopamine Reset</span>
+            </div>
+            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+              <span class="text-slate-400 block font-mono">1 MONTH (30 DAYS)</span>
+              <strong class="text-white block font-orbitron my-1">+150 XP BONUS</strong>
+              <span class="text-[10px] text-emerald-400">Sovereign Will</span>
+            </div>
+            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+              <span class="text-slate-400 block font-mono">90 DAYS MASTER</span>
+              <strong class="text-white block font-orbitron my-1">+500 XP MAJOR</strong>
+              <span class="text-[10px] text-emerald-400">Neural Re-wiring</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -881,7 +1010,7 @@
   <!-- JS CONTROLLER & ENGINE -->
   <script>
     const CATEGORIES = ["Gym", "Evolution", "Work", "Finance", "Socialise"];
-    const STORAGE_KEY = "tatake_isekai_v9_sovereign";
+    const STORAGE_KEY = "tatake_isekai_v10_sovereign";
     const localDateStr = (date = new Date()) => {
       const y = date.getFullYear();
       const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -1028,6 +1157,14 @@
         gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
         osc.start(now);
         osc.stop(now + 0.3);
+      } else if (type === 'strike') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.linearRampToValueAtTime(60, now + 0.3);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
       } else if (type === 'levelup') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(261.63, now);
@@ -1036,14 +1173,6 @@
         gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
         osc.start(now);
         osc.stop(now + 0.6);
-      } else if (type === 'timer_end') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.setValueAtTime(1760, now + 0.2);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
-        osc.start(now);
-        osc.stop(now + 0.5);
       }
     }
 
@@ -1112,11 +1241,16 @@
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
         if (saved) {
           return {
-            xp: saved.xp || 0,
-            streak: saved.streak || 1,
+            xp: Number(saved.xp) || 0,
+            streak: Number(saved.streak) || 1,
+            strikes: Number(saved.strikes) || 0,
+            soberDays: Number(saved.soberDays) || 0,
+            lastSoberDate: saved.lastSoberDate || null,
+            soberMilestoneClaimedWeeks: saved.soberMilestoneClaimedWeeks || 0,
+            weeklyQuote: saved.weeklyQuote || "I am building an unshakeable mind and body.",
+            lastQuoteUpdateDate: saved.lastQuoteUpdateDate || todayStr(),
             playerName: saved.playerName || "DISCIPLINE SOVEREIGN",
             titleLocked: !!saved.titleLocked,
-            strictMode: !!saved.strictMode,
             lastActiveDate: saved.lastActiveDate || todayStr(),
             mandatory: saved.mandatory && saved.mandatory.length ? saved.mandatory : DEFAULT_MANDATORY_TASKS,
             daily: saved.daily || [],
@@ -1133,9 +1267,14 @@
       return {
         xp: 0,
         streak: 1,
+        strikes: 0,
+        soberDays: 0,
+        lastSoberDate: null,
+        soberMilestoneClaimedWeeks: 0,
+        weeklyQuote: "I am building an unshakeable mind and body.",
+        lastQuoteUpdateDate: todayStr(),
         playerName: "DISCIPLINE SOVEREIGN",
         titleLocked: false,
-        strictMode: false,
         lastActiveDate: todayStr(),
         mandatory: DEFAULT_MANDATORY_TASKS,
         daily: [],
@@ -1200,8 +1339,23 @@
       return 1.0;
     }
 
+    function addStrike(reason) {
+      state.strikes = (state.strikes || 0) + 1;
+      playSound('strike');
+      showToast(`STRIKE ADDED (${state.strikes}/3): ${reason}`);
+
+      if (state.strikes >= 3) {
+        state.strikes = 0;
+        const maxDeduction = 30; // Maximum capped deduction per 3 strikes
+        state.xp = (state.xp || 0) - maxDeduction;
+        logXPTransaction(-maxDeduction, "3 STRIKES PENALTY REACHED (-30 XP)");
+        showToast("⚠️ 3 STRIKES REACHED: -30 XP DEDUCTED!");
+      }
+      saveState();
+    }
+
     function getLevelInfo(xp) {
-      const lvl = Math.max(1, Math.floor(xp / 5000) + 1);
+      const lvl = Math.max(1, Math.floor((xp || 0) / 5000) + 1);
       let rank = "RANK E";
       let title = "Beast Mode";
       let classTitle = "Monk of Discipline";
@@ -1237,7 +1391,7 @@
         showToast("Title is PERMANENTLY LOCKED.");
         return;
       }
-      const confirmLock = confirm("PERMANENT ACTION: Are you sure you want to lock your title and name? This single-use feature CANNOT be undone!");
+      const confirmLock = confirm("PERMANENT ACTION: Are you sure you want to lock your title and name? This feature CANNOT be undone!");
       if (confirmLock) {
         state.titleLocked = true;
         saveState();
@@ -1260,31 +1414,9 @@
       }
     }
 
-    function toggleStrictMode() {
-      state.strictMode = !state.strictMode;
-      saveState();
-      render();
-      showToast(state.strictMode ? "STRICT MODE ENABLED: Missed tasks penalty active!" : "Strict Mode Disabled");
-    }
-
     function triggerDailyRollover() {
-      const confirmReset = confirm("Initiate Daily Rollover? This will uncheck today's habits and daily quests for a clean fresh start, preserving your XP, Level & Roadmaps.");
+      const confirmReset = confirm("Initiate Daily Rollover? This will uncheck today's habits and daily quests for a clean start.");
       if (!confirmReset) return;
-
-      if (state.strictMode) {
-        let missedCount = 0;
-        state.mandatory.forEach(t => {
-          if (t.completedOn !== todayStr()) {
-            missedCount++;
-          }
-        });
-        if (missedCount > 0) {
-          const penalty = missedCount * 20;
-          state.xp -= penalty;
-          logXPTransaction(-penalty, `Strict Mode Penalty (${missedCount} missed habits)`);
-          showToast(`Strict Penalty: -${penalty} XP applied!`);
-        }
-      }
 
       state.mandatory.forEach(t => { t.completedOn = null; });
       state.daily.forEach(t => { t.completedOn = null; });
@@ -1293,6 +1425,75 @@
       saveState();
       render();
       showToast("Daily Rollover Complete. Execute Today's Quests!");
+    }
+
+    // SOBER STREAK FUNCTIONS
+    function recordSoberDay() {
+      const today = todayStr();
+      if (state.lastSoberDate === today) {
+        showToast("Today is already logged as Sober!");
+        return;
+      }
+      state.soberDays = (state.soberDays || 0) + 1;
+      state.lastSoberDate = today;
+
+      // Check weekly milestone (+35 XP for every completed week)
+      const currentWeeks = Math.floor(state.soberDays / 7);
+      const claimedWeeks = state.soberMilestoneClaimedWeeks || 0;
+
+      if (currentWeeks > claimedWeeks) {
+        const newlyClaimed = currentWeeks - claimedWeeks;
+        const xpEarned = newlyClaimed * 35;
+        state.soberMilestoneClaimedWeeks = currentWeeks;
+        state.xp = (state.xp || 0) + xpEarned;
+        logXPTransaction(xpEarned, `Sober Milestone: ${currentWeeks} Weeks Clean (+${xpEarned} XP)`);
+        playSound('complete');
+        showToast(`🎉 SOBER MILESTONE! +${xpEarned} XP for ${currentWeeks} Weeks Consistent!`);
+      } else {
+        showToast(`Sober Day Logged! Total: ${state.soberDays} Days Clean.`);
+      }
+
+      saveState();
+      render();
+    }
+
+    function resetSoberStreak() {
+      const confirmReset = confirm("Are you sure you want to reset your Sober Streak? Stay honest with yourself.");
+      if (!confirmReset) return;
+      state.soberDays = 0;
+      state.lastSoberDate = null;
+      state.soberMilestoneClaimedWeeks = 0;
+      saveState();
+      render();
+      showToast("Sober Streak reset. Rebuild stronger!");
+    }
+
+    function saveWeeklyQuote() {
+      const text = document.getElementById("weeklyQuoteInput").value.trim();
+      if (!text) {
+        showToast("Please enter a motivation statement.");
+        return;
+      }
+      state.weeklyQuote = text;
+      state.lastQuoteUpdateDate = todayStr();
+      document.getElementById("weeklyQuoteInput").value = "";
+      saveState();
+      render();
+      showToast("Weekly Motivation Statement Updated!");
+    }
+
+    function checkWeeklyQuotePenalty() {
+      const today = new Date();
+      const lastUpdate = state.lastQuoteUpdateDate ? new Date(state.lastQuoteUpdateDate) : new Date();
+      const diffDays = Math.floor((today - lastUpdate) / (1000 * 60 * 60 * 24));
+
+      if (diffDays >= 7) {
+        state.xp = (state.xp || 0) - 35;
+        state.lastQuoteUpdateDate = todayStr(); // Reset timer after penalty
+        logXPTransaction(-35, "Weekly Motivation Not Updated Penalty (-35 XP)");
+        saveState();
+        showToast("⚠️ -35 XP Penalty: Weekly Motivation was not updated in 7 days!");
+      }
     }
 
     function setupCategories() {
@@ -1338,7 +1539,7 @@
                   <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">${safeText(task.category || '')}</span>
                   <span class="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-hud-cyan">${task.period === 'afternoon' ? 'Afternoon' : 'Morning'}</span>
                 </div>
-                <div class="text-xs text-slate-400">${isDone ? 'Completed Today' : 'Ready'}${task.dueDate ? ' · Due: '+safeText(task.dueDate) : ''}</div>
+                <div class="text-xs text-slate-400">${isDone ? 'Completed Today' : 'Ready'}${task.dueDate ? ' · Target/Due: '+safeText(task.dueDate) : ''}</div>
               </div>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
@@ -1461,7 +1662,7 @@
           } else {
             clearInterval(timerInterval);
             isTimerRunning = false;
-            playSound('timer_end');
+            playSound('complete');
             
             if (!isBreakMode) {
               showToast("Focus Session Complete! Take a 5-min Rest.");
@@ -1579,31 +1780,48 @@
       const nextWeek = localDateStr(new Date(Date.now()+7*86400000));
       const upcoming = tasks.filter(t=>t.dueDate > today && t.dueDate <= nextWeek && !isComplete(t));
       const card = (label,count,detail,color) => `<div class="rounded border border-slate-700 bg-slate-950/70 p-3"><div class="text-xs text-slate-400 uppercase">${label}</div><div class="font-orbitron text-2xl ${color} font-bold">${count}</div><div class="text-xs text-slate-500">${detail}</div></div>`;
-      host.innerHTML = card('Overdue',overdue.length,'Past deadline · penalty applies','text-hud-crimson') +
+      host.innerHTML = card('Overdue (Strike Danger)',overdue.length,'Past target deadline','text-hud-crimson') +
         card('Due today',dueToday.length,'Needs completion today','text-hud-gold') +
         card('Next 7 days',upcoming.length,'Upcoming incomplete tasks','text-hud-cyan');
     }
 
-    function applyOverduePenalties() {
-      const today = todayStr(); let count = 0;
-      const all = [...state.mandatory, ...state.daily, ...state.monthly];
-      all.forEach(task => {
-        if (!task.dueDate || task.dueDate >= today || task.overduePenaltyApplied) return;
-        const completedByDueDate = !!(task.completedOn && task.completedOn <= task.dueDate);
-        if (!completedByDueDate) {
-          task.overduePenaltyApplied = true;
-          task.overduePenaltyDate = today;
-          state.xp = (Number(state.xp)||0) - 40;
-          logXPTransaction(-40, `Overdue Penalty (${task.name})`);
-          count++;
+    // TIME FACTOR & CONSEQUENCES SYSTEM
+    function applyTimeConsequencesAndStrikes() {
+      const today = new Date();
+      const todayString = todayStr();
+
+      // Check for tasks missed or not updated before the end of the next day
+      const allTasks = [...state.mandatory, ...state.daily, ...state.monthly];
+      let penalizedCount = 0;
+
+      allTasks.forEach(task => {
+        if (!task.dueDate) return;
+
+        const dueDateObj = new Date(task.dueDate);
+        // End of next day after due date
+        const nextDayEnd = new Date(dueDateObj);
+        nextDayEnd.setDate(nextDayEnd.getDate() + 2); // 2 days past due date start = end of next day
+
+        const isPastNextDay = today > nextDayEnd;
+        const isNotCompleted = !task.completedOn && !task.completed;
+
+        if (isPastNextDay && isNotCompleted && !task.nextDayPenaltyApplied) {
+          task.nextDayPenaltyApplied = true;
+          state.xp = (state.xp || 0) - 10;
+          logXPTransaction(-10, `Missed Task Consequences (-10 XP): ${task.name}`);
+          addStrike(`Task non-update deadline passed (${task.name})`);
+          penalizedCount++;
         }
       });
-      if (count) { saveState(); showToast(`-${count*40} XP: ${count} overdue task${count===1?'':'s'}`); }
-      return count;
+
+      if (penalizedCount > 0) {
+        saveState();
+      }
     }
 
     function render() {
-      applyOverduePenalties();
+      applyTimeConsequencesAndStrikes();
+      checkWeeklyQuotePenalty();
 
       const info = getLevelInfo(state.xp);
       const level = info.lvl;
@@ -1614,18 +1832,17 @@
       document.getElementById("levelDisplay").textContent = level;
       document.getElementById("rankBadge").textContent = info.rank;
       document.getElementById("playerTitle").textContent = info.title;
-      document.getElementById("classTitle").textContent = info.classTitle;
       document.getElementById("playerNameDisplay").textContent = safeText(state.playerName);
       document.getElementById("multiplierDisplay").textContent = `${mult.toFixed(1)}x`;
 
-      const strictBtn = document.getElementById("strictModeBtn");
-      if (state.strictMode) {
-        strictBtn.className = "cyber-btn bg-hud-crimson/20 border border-hud-crimson px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-hud-crimson flex items-center gap-1.5";
-        document.getElementById("strictModeLabel").textContent = "STRICT: ON";
-      } else {
-        strictBtn.className = "cyber-btn bg-hud-dark border border-slate-700 px-3 py-1.5 rounded text-xs font-rajdhani font-bold text-slate-400 hover:border-hud-crimson flex items-center gap-1.5";
-        document.getElementById("strictModeLabel").textContent = "STRICT: OFF";
-      }
+      // Render Strikes Icons
+      const strikes = state.strikes || 0;
+      const strikeContainer = document.getElementById("strikeIcons");
+      strikeContainer.innerHTML = [1, 2, 3].map(i => 
+        i <= strikes 
+          ? `<span class="w-3 h-3 rounded-full bg-hud-crimson shadow-[0_0_8px_#e63946]"></span>`
+          : `<span class="w-3 h-3 rounded-full border border-hud-crimson bg-slate-950"></span>`
+      ).join('');
 
       const lockBtn = document.getElementById("titleLockButton");
       if (state.titleLocked) {
@@ -1634,7 +1851,7 @@
         document.getElementById("editNameBtn").classList.add("hidden");
       } else {
         lockBtn.className = "text-xs font-orbitron font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400 hover:bg-amber-500/30";
-        lockBtn.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> LOCK TITLE (1-USE)`;
+        lockBtn.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> LOCK TITLE`;
         document.getElementById("editNameBtn").classList.remove("hidden");
       }
 
@@ -1644,80 +1861,139 @@
       document.getElementById("xpToNextDisplay").textContent = state.xp < 0 ? `${Math.abs(state.xp).toLocaleString()} XP below zero` : `${(5000 - currentXPWithin).toLocaleString()} XP to Level ${level + 1}`;
       document.getElementById("streakDisplay").textContent = `${state.streak || 1} Days`;
 
+      // Sober Stats
+      const soberDays = state.soberDays || 0;
+      const soberDisplay = document.getElementById("soberDisplay");
+      if (soberDisplay) soberDisplay.textContent = `${soberDays} Days`;
+
+      const soberStat = document.getElementById("soberStat");
+      if (soberStat) soberStat.textContent = soberDays;
+
+      const dashSoberDays = document.getElementById("dashSoberDays");
+      if (dashSoberDays) dashSoberDays.textContent = `${soberDays} Days`;
+
+      const soberDaysCount = document.getElementById("soberDaysCount");
+      if (soberDaysCount) soberDaysCount.textContent = soberDays;
+
+      const soberWeeksCount = document.getElementById("soberWeeksCount");
+      if (soberWeeksCount) soberWeeksCount.textContent = `${Math.floor(soberDays / 7)} Weeks Clean (${(state.soberMilestoneClaimedWeeks || 0) * 35} XP Earned)`;
+
+      const motdQuoteText = document.getElementById("motdQuoteText");
+      if (motdQuoteText) motdQuoteText.textContent = `"${state.weeklyQuote || 'I am building an unshakeable mind and body.'}"`;
+
+      const activeQuoteDisplay = document.getElementById("activeQuoteDisplay");
+      if (activeQuoteDisplay) activeQuoteDisplay.textContent = `"${state.weeklyQuote || 'I am building an unshakeable mind and body.'}"`;
+
       const mandatoryDoneCount = state.mandatory.filter(t => t.completedOn === todayStr()).length;
-      document.getElementById("mandatoryStat").textContent = `${mandatoryDoneCount}/${state.mandatory.length}`;
-      document.getElementById("dailyStat").textContent = state.daily.filter(t => t.completedOn === todayStr()).length;
-      document.getElementById("monthlyStat").textContent = state.monthly.filter(t => t.completed).length;
+      const mandatoryStat = document.getElementById("mandatoryStat");
+      if (mandatoryStat) mandatoryStat.textContent = `${mandatoryDoneCount}/${state.mandatory.length}`;
+
+      const dailyStat = document.getElementById("dailyStat");
+      if (dailyStat) dailyStat.textContent = state.daily.filter(t => t.completedOn === todayStr()).length;
+
+      const monthlyStat = document.getElementById("monthlyStat");
+      if (monthlyStat) monthlyStat.textContent = state.monthly.filter(t => t.completed).length;
 
       const totalMandatory = state.mandatory.length || 50;
       const mandatoryPct = Math.round((mandatoryDoneCount / totalMandatory) * 100);
-      document.getElementById("mandatoryPctText").textContent = `${mandatoryPct}%`;
-      document.getElementById("dashMandatoryCount").textContent = `${mandatoryDoneCount}/${totalMandatory}`;
-      
-      const circumference = 2 * Math.PI * 50;
-      const offset = circumference - (mandatoryPct / 100) * circumference;
-      document.getElementById("mandatoryRing").style.strokeDashoffset = offset;
+      const mandatoryPctText = document.getElementById("mandatoryPctText");
+      if (mandatoryPctText) mandatoryPctText.textContent = `${mandatoryPct}%`;
 
-      document.getElementById("dashGoalCount").textContent = `${state.goals.length} Active`;
-      document.getElementById("dashGoalSummary").innerHTML = state.goals.slice(0, 2).map(g => {
-        const totalS = g.steps ? g.steps.length : 0;
-        const doneS = g.steps ? g.steps.filter(s => s.done).length : 0;
-        const pct = totalS ? Math.round((doneS / totalS) * 100) : 0;
-        return `
-          <div class="bg-slate-900/80 p-2 rounded border border-slate-800">
-            <div class="flex justify-between font-semibold text-white">
-              <span class="truncate">${safeText(g.title)}</span>
-              <span class="text-hud-gold">${pct}%</span>
+      const dashMandatoryCount = document.getElementById("dashMandatoryCount");
+      if (dashMandatoryCount) dashMandatoryCount.textContent = `${mandatoryDoneCount}/${totalMandatory}`;
+      
+      const mandatoryRing = document.getElementById("mandatoryRing");
+      if (mandatoryRing) {
+        const circumference = 2 * Math.PI * 50;
+        const offset = circumference - (mandatoryPct / 100) * circumference;
+        mandatoryRing.style.strokeDashoffset = offset;
+      }
+
+      const dashGoalCount = document.getElementById("dashGoalCount");
+      if (dashGoalCount) dashGoalCount.textContent = `${state.goals.length} Active`;
+
+      const dashGoalSummary = document.getElementById("dashGoalSummary");
+      if (dashGoalSummary) {
+        dashGoalSummary.innerHTML = state.goals.slice(0, 2).map(g => {
+          const totalS = g.steps ? g.steps.length : 0;
+          const doneS = g.steps ? g.steps.filter(s => s.done).length : 0;
+          const pct = totalS ? Math.round((doneS / totalS) * 100) : 0;
+          return `
+            <div class="bg-slate-900/80 p-2 rounded border border-slate-800">
+              <div class="flex justify-between font-semibold text-white">
+                <span class="truncate">${safeText(g.title)}</span>
+                <span class="text-hud-gold">${pct}%</span>
+              </div>
+              <div class="w-full h-1 bg-slate-800 rounded mt-1 overflow-hidden">
+                <div class="h-full bg-hud-gold" style="width:${pct}%"></div>
+              </div>
             </div>
-            <div class="w-full h-1 bg-slate-800 rounded mt-1 overflow-hidden">
-              <div class="h-full bg-hud-gold" style="width:${pct}%"></div>
-            </div>
-          </div>
-        `;
-      }).join('') || '<p class="text-slate-500">No active goals configured.</p>';
+          `;
+        }).join('') || '<p class="text-slate-500">No active goals configured.</p>';
+      }
 
       const sortedRewards = [...state.rewards].sort((a,b) => a.level - b.level);
       const nextReward = sortedRewards.find(r => r.level > level);
-      document.getElementById("dashRewardNotice").innerHTML = nextReward ? `
-        <div class="bg-slate-900 p-3 rounded border border-purple-500/40">
-          <span class="text-[10px] text-purple-400 font-mono block">LEVEL ${nextReward.level} REWARD</span>
-          <strong class="text-sm text-white font-orbitron">${safeText(nextReward.name)}</strong>
-        </div>
-      ` : `<p class="text-xs text-slate-400">All set milestone rewards achieved!</p>`;
-
-      document.getElementById("dashDailySummary").innerHTML = state.daily.filter(passesFilter).slice(0, 3).map(t => taskItemHTML(t, 'daily')).join('') || '<p class="text-slate-500">No daily quests added yet.</p>';
-
-      if (state.budget) {
-        document.getElementById("dashBudgetSummary").innerHTML = `
-          <div class="flex justify-between">
-            <span class="text-slate-400">Remaining Balance:</span>
-            <strong class="text-white">${formatMoney(state.budget.balance)}</strong>
+      const dashRewardNotice = document.getElementById("dashRewardNotice");
+      if (dashRewardNotice) {
+        dashRewardNotice.innerHTML = nextReward ? `
+          <div class="bg-slate-900 p-3 rounded border border-purple-500/40">
+            <span class="text-[10px] text-purple-400 font-mono block">LEVEL ${nextReward.level} REWARD</span>
+            <strong class="text-sm text-white font-orbitron">${safeText(nextReward.name)}</strong>
           </div>
-        `;
+        ` : `<p class="text-xs text-slate-400">All set milestone rewards achieved!</p>`;
       }
 
-      document.getElementById("mandatoryHeaderProgress").textContent = `${mandatoryDoneCount} / ${totalMandatory} (${mandatoryPct}%)`;
-      const mandatoryContainer = document.getElementById("mandatoryListContainer");
-      mandatoryContainer.innerHTML = CATEGORIES.map(cat => {
-        if (selectedCategoryFilter !== "ALL" && selectedCategoryFilter !== cat) return "";
-        const catTasks = state.mandatory.filter(t => t.category === cat && passesFilter(t));
-        if (!catTasks.length) return "";
-        const catDone = catTasks.filter(t => t.completedOn === todayStr()).length;
-        return `
-          <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800">
-            <h3 class="font-orbitron font-bold text-xs text-hud-cyan mb-3 flex justify-between items-center border-b border-slate-800 pb-2">
-              <span><i class="fa-solid fa-layer-group text-slate-500 mr-2"></i>${cat.toUpperCase()} PROTOCOL</span>
-              <span class="font-mono text-slate-400">${catDone}/${catTasks.length} Done</span>
-            </h3>
-            <ul class="space-y-2">
-              ${catTasks.map(t => taskItemHTML(t, 'mandatory')).join('')}
-            </ul>
-          </div>
-        `;
-      }).join('') || '<p class="text-xs text-slate-500 p-4 text-center">No mandatory tasks match the criteria.</p>';
+      const dashDailySummary = document.getElementById("dashDailySummary");
+      if (dashDailySummary) {
+        dashDailySummary.innerHTML = state.daily.filter(passesFilter).slice(0, 3).map(t => taskItemHTML(t, 'daily')).join('') || '<p class="text-slate-500">No daily quests added yet.</p>';
+      }
 
-      document.getElementById("dailyList").innerHTML = state.daily.filter(t => passesFilter(t) && (selectedDayPeriod === 'all' || (t.period || 'morning') === selectedDayPeriod)).map(t => taskItemHTML(t, 'daily')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No daily quests found.</li>';
-      document.getElementById("monthlyList").innerHTML = state.monthly.filter(passesFilter).map(t => taskItemHTML(t, 'monthly')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No monthly goals found.</li>';
+      if (state.budget) {
+        const dashBudgetSummary = document.getElementById("dashBudgetSummary");
+        if (dashBudgetSummary) {
+          dashBudgetSummary.innerHTML = `
+            <div class="flex justify-between">
+              <span class="text-slate-400">Remaining Balance:</span>
+              <strong class="text-white">${formatMoney(state.budget.balance)}</strong>
+            </div>
+          `;
+        }
+      }
+
+      const mandatoryHeaderProgress = document.getElementById("mandatoryHeaderProgress");
+      if (mandatoryHeaderProgress) mandatoryHeaderProgress.textContent = `${mandatoryDoneCount} / ${totalMandatory} (${mandatoryPct}%)`;
+
+      const mandatoryContainer = document.getElementById("mandatoryListContainer");
+      if (mandatoryContainer) {
+        mandatoryContainer.innerHTML = CATEGORIES.map(cat => {
+          if (selectedCategoryFilter !== "ALL" && selectedCategoryFilter !== cat) return "";
+          const catTasks = state.mandatory.filter(t => t.category === cat && passesFilter(t));
+          if (!catTasks.length) return "";
+          const catDone = catTasks.filter(t => t.completedOn === todayStr()).length;
+          return `
+            <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800">
+              <h3 class="font-orbitron font-bold text-xs text-hud-cyan mb-3 flex justify-between items-center border-b border-slate-800 pb-2">
+                <span><i class="fa-solid fa-layer-group text-slate-500 mr-2"></i>${cat.toUpperCase()} PROTOCOL</span>
+                <span class="font-mono text-slate-400">${catDone}/${catTasks.length} Done</span>
+              </h3>
+              <ul class="space-y-2">
+                ${catTasks.map(t => taskItemHTML(t, 'mandatory')).join('')}
+              </ul>
+            </div>
+          `;
+        }).join('') || '<p class="text-xs text-slate-500 p-4 text-center">No mandatory tasks match the criteria.</p>';
+      }
+
+      const dailyList = document.getElementById("dailyList");
+      if (dailyList) {
+        dailyList.innerHTML = state.daily.filter(t => passesFilter(t) && (selectedDayPeriod === 'all' || (t.period || 'morning') === selectedDayPeriod)).map(t => taskItemHTML(t, 'daily')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No daily quests found.</li>';
+      }
+
+      const monthlyList = document.getElementById("monthlyList");
+      if (monthlyList) {
+        monthlyList.innerHTML = state.monthly.filter(passesFilter).map(t => taskItemHTML(t, 'monthly')).join('') || '<li class="text-xs text-slate-500 py-3 text-center">No monthly goals found.</li>';
+      }
       
       renderDisciplineHeatmap();
       renderTaskChecklists();
@@ -1725,26 +2001,29 @@
       renderTimerTaskOptions();
       renderAuditLog();
 
-      document.getElementById("rewardsGrid").innerHTML = sortedRewards.map(r => {
-        const unlocked = level >= r.level;
-        return `
-          <div class="cyber-panel p-4 flex flex-col justify-between ${unlocked ? 'cyber-panel-gold' : ''}">
-            <div>
-              <div class="flex justify-between items-center">
-                <span class="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded ${unlocked ? 'bg-hud-gold text-slate-950' : 'bg-slate-800 text-slate-400'}">
-                  LEVEL ${r.level} REWARD
-                </span>
-                <button onclick="editReward('${r.id}')" class="text-hud-cyan hover:text-white text-xs"><i class="fa-solid fa-pen"></i></button>
+      const rewardsGrid = document.getElementById("rewardsGrid");
+      if (rewardsGrid) {
+        rewardsGrid.innerHTML = sortedRewards.map(r => {
+          const unlocked = level >= r.level;
+          return `
+            <div class="cyber-panel p-4 flex flex-col justify-between ${unlocked ? 'cyber-panel-gold' : ''}">
+              <div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded ${unlocked ? 'bg-hud-gold text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                    LEVEL ${r.level} REWARD
+                  </span>
+                  <button onclick="editReward('${r.id}')" class="text-hud-cyan hover:text-white text-xs"><i class="fa-solid fa-pen"></i></button>
+                </div>
+                <h4 class="font-orbitron font-bold text-white text-base mt-2">${safeText(r.name)}</h4>
               </div>
-              <h4 class="font-orbitron font-bold text-white text-base mt-2">${safeText(r.name)}</h4>
+              <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+                <span class="${unlocked ? 'text-hud-gold font-bold' : 'text-slate-500'}">${unlocked ? 'UNLOCKED 🎉' : 'LOCKED'}</span>
+                <button onclick="deleteReward('${r.id}')" class="text-slate-600 hover:text-hud-crimson"><i class="fa-solid fa-trash"></i></button>
+              </div>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
-              <span class="${unlocked ? 'text-hud-gold font-bold' : 'text-slate-500'}">${unlocked ? 'UNLOCKED 🎉' : 'LOCKED'}</span>
-              <button onclick="deleteReward('${r.id}')" class="text-slate-600 hover:text-hud-crimson"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>
-        `;
-      }).join('') || '<p class="text-xs text-slate-500 col-span-3">No level rewards created.</p>';
+          `;
+        }).join('') || '<p class="text-xs text-slate-500 col-span-3">No level rewards created.</p>';
+      }
 
       renderBudgetPage();
       renderDeliverablesOverview();
@@ -2000,16 +2279,16 @@
       const arr = type === 'mandatory' ? state.mandatory : (type === 'daily' ? state.daily : state.monthly);
       const task = arr.find(t => t.id === id); if (!task) return;
       const name = prompt('Edit task name:', task.name); if (name === null) return;
-      const dueDate = prompt('Due date (YYYY-MM-DD; leave blank for none):', task.dueDate || ''); if (dueDate === null) return;
+      const dueDate = prompt('Target / Due date (YYYY-MM-DD; leave blank for none):', task.dueDate || ''); if (dueDate === null) return;
       const period = prompt('Time of day: enter morning or afternoon', task.period || 'morning'); if (period === null) return;
       const category = prompt('Category:', task.category || 'Work'); if (category === null) return;
       const xp = prompt('XP value:', String(task.xp || 10)); if (xp === null) return;
       
       task.name = name.trim() || task.name;
-      if ((task.dueDate || '') !== dueDate.trim()) { task.overduePenaltyApplied = false; task.overduePenaltyDate = null; }
       task.dueDate = dueDate.trim();
       task.period = period.toLowerCase() === 'afternoon' ? 'afternoon' : 'morning';
-      task.category = category.trim() || task.category; task.xp = Math.max(1, Number(xp) || task.xp || 10);
+      task.category = category.trim() || task.category; 
+      task.xp = Math.max(1, Number(xp) || task.xp || 10);
       
       if (type === 'daily') {
         const current = (task.subtasks || []).map(x=>x.text).join('\n');
@@ -2173,9 +2452,11 @@
           if (!validState) throw new Error('Backup structure is not a valid TATAKE state');
           imported.xp = Number(imported.xp);
           imported.streak = Number(imported.streak) || 1;
+          imported.strikes = Number(imported.strikes) || 0;
+          imported.soberDays = Number(imported.soberDays) || 0;
+          imported.weeklyQuote = imported.weeklyQuote || "I am building an unshakeable mind and body.";
           imported.playerName = imported.playerName || "DISCIPLINE SOVEREIGN";
           imported.titleLocked = !!imported.titleLocked;
-          imported.strictMode = !!imported.strictMode;
           imported.journal = imported.journal || [];
           imported.xpLog = imported.xpLog || [];
           imported.heatmapData = imported.heatmapData || {};
@@ -2194,6 +2475,16 @@
     });
 
     setupCategories();
+
+    // Auto-hide MOTD Splash Overlay after 2.2 seconds
+    setTimeout(() => {
+      const motd = document.getElementById("motdOverlay");
+      if (motd) {
+        motd.style.transition = "opacity 0.4s ease-out";
+        motd.style.opacity = "0";
+        setTimeout(() => motd.remove(), 400);
+      }
+    }, 2200);
 
     if (window.FirebaseBridge) {
       window.FirebaseBridge.init(
@@ -2222,7 +2513,6 @@
     document.getElementById('taskListGrouping')?.addEventListener('change', renderTaskChecklists);
     document.getElementById('taskListStatus')?.addEventListener('change', renderTaskChecklists);
 
-    setInterval(() => { if (applyOverduePenalties()) render(); }, 60000);
     render();
   </script>
 </body>
